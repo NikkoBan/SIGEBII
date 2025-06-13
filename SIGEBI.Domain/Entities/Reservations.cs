@@ -1,0 +1,14 @@
+﻿using SIGEBI.Domain.Base;
+
+namespace SIGEBI.Domain.Entities
+{
+    public  class Reservations : AuditEntity<int>
+    {
+        public override int Id { get; set; }
+        public int BookId { get; set; }
+        public int UserId { get; set; }     
+        public DateTime ReservationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public string? ReservationStatus { get; set; } 
+    }
+}
