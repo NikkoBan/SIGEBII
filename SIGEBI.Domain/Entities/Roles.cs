@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Category
+
+    public class Role
     {
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = string.Empty;
+        public int RoleId { get; set; }
+        public string RoleName { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public ICollection<Book>? Books { get; set; }
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
+
 }

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities
 {
-    internal class BookAuthor
+    public class BookAuthor
     {
+        public int BookId { get; set; }
+        public int AuthorId { get; set; }
+        public Book? Book { get; set; }
+        public Author? Author { get; set; }
     }
 }
