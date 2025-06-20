@@ -9,14 +9,10 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class SystemSetting : BaseEntity<int>
+    public class ReservationStatuses : AuditEntity<int>
     {
-        [Column("SettingID")]
-        [Key]
         public override int ID { get; set; }
-        public string SettingName { get; set; } = string.Empty;
-        public string SettingValue { get; set; } = string.Empty;
-        public string ValueDataType { get; set; } = string.Empty;
-        public string? Description { get; set; }
+        public string StatusName { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -9,21 +9,21 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Sanction : BaseEntity<int>
+    public class Sanctions : AuditEntity<int>
     {
-        [Column("SanctionID")]
-        [Key]
+       
         public override int ID { get; set; }
         public int UserId { get; set; }
-        public int? LoanId { get; set; }
-        public string SanctionType { get; set; } = string.Empty;
-        public decimal? FineAmount { get; set; }
+        public int LoanId { get; set; }
+        public required string SanctionType { get; set; }
+        public decimal FineAmount { get; set; }
         public DateTime ImpositionDate { get; set; }
+
         public DateTime? DueDate { get; set; }
         public DateTime? PaymentDate { get; set; }
-        public string Reason { get; set; } = string.Empty;
-        public string SanctionStatus { get; set; } = string.Empty;
-        public User? User { get; set; }
-        public Loan? Loan { get; set; }
+        public required string Reason { get; set; }
+        public required string SanctionStatus { get; set; }
+
+        public required virtual Users User { get; set; }
     }
 }

@@ -9,15 +9,15 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Author : BaseEntity<int>
+    public class Authors : AuditEntity<int>
     {
-        [Column("BookID")]
-        [Key]
+        
         public override int ID { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public DateTime? BirthDate { get; set; }
+        public required string FirstName { get; set; }
+        public required string LastNameId { get; set; }
+        public DateOnly BirthDate { get; set; }
         public string? Nationality { get; set; }
-        public ICollection<BookAuthor>? BookAuthors { get; set; }
+
+        public virtual ICollection<BookAuthor>? BooksAuthors { get; set; } = new List<BookAuthor>();
     }
 }

@@ -9,20 +9,17 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class SpecialMaterial : BaseEntity<int>
+    public class SpecialMaterials : AuditEntity<int>
     {
-        [Column("MaterialID")]
-        [Key]
+        
         public override int ID { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string? Author { get; set; }
+        public required string Tittle { get; set; }
+        public required string Author { get; set; }
         public string? Description { get; set; }
         public DateTime RequestDate { get; set; }
-        public int RequestedByUserId { get; set; }
-        public string ApprovalStatus { get; set; } = string.Empty;
+        public string? ApprovalStatus { get; set; }
+        public DateTime AdquisitionDate { get; set; }
         public int? ApprovedByUserId { get; set; }
-        public DateTime? AcquisitionDate { get; set; }
-        public User? RequestedByUser { get; set; }
-        public User? ApprovedByUser { get; set; }
+        public int RequestedByUserId { get; set; }
     }
 }

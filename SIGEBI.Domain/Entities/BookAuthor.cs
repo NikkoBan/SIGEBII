@@ -6,17 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SIGEBI.Domain.Base;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class BookAuthor : BaseEntity<int>
+    public class BookAuthor : AuditEntity<int>
     {
-        [Column("BookID")]
-        [Key]
-        public override int ID { get; set; }
+        
+        public int BookId { get; set; }
         public int AuthorId { get; set; }
-        public Book? Book { get; set; }
-        public Author? Author { get; set; }
+        public virtual Books? Book { get; set; }
+        public virtual Authors? Author { get; set; }
     }
 
 }

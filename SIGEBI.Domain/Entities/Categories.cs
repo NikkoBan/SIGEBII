@@ -9,13 +9,11 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Roles : AuditEntity<int>
+    public class Categories : AuditEntity<int>
     {
-        
+       
         public override int ID { get; set; }
-        public required string RoleName { get; set; }
-        public required string Description { get; set; }
-
-
+        public required string CategoryName { get; set; }
+        public string? Description { get; set; }
     }
 }

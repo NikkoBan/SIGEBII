@@ -9,18 +9,14 @@ using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Domain.Entities
 {
-    public class Loan : BaseEntity<int>
+    public class Reservations : AuditEntity<int>
     {
-        [Column("LoanID")]
-        [Key]
+       
         public override int ID { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }
-        public DateTime LoanDate { get; set; }
-        public DateTime DueDate { get; set; }
-        public DateTime? ReturnDate { get; set; }
-        public string LoanStatus { get; set; } = string.Empty;
-        public Book? Book { get; set; }
-        public User? User { get; set; }
+        public DateTime ReservationDate { get; set; }
+        public DateTime ExpirationDate { get; set; }
+        public string? ReservationStatus { get; set; }
     }
 }
