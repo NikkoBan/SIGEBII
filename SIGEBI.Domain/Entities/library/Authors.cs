@@ -1,6 +1,6 @@
 ﻿using SIGEBI.Domain.Base;
 
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Entities.library
 {
     public class Authors : AuditEntity<int>
     {

@@ -1,4 +1,4 @@
-﻿namespace SIGEBI.Domain.Entities
+﻿namespace SIGEBI.Domain.Entities.circulation
 {
     public class ReservationHistory // Guarga un registro de reservas ya finalizadas. Es una copia de la transaccion finalizada.
     {

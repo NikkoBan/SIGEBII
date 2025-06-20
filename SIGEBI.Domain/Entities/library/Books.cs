@@ -1,6 +1,8 @@
 ﻿using SIGEBI.Domain.Base;
+using SIGEBI.Domain.Entities.circulation;
+using SIGEBI.Domain.Entities.core;
 
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Entities.library
 {
     public class Books : AuditEntity<int>
     {

@@ -1,6 +1,6 @@
 ﻿using SIGEBI.Domain.Base;
 
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Entities.circulation
 {
     public  class Reservations : AuditEntity<int>
     {
