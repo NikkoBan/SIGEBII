@@ -1,12 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+
+using SIGEBI.Domain.Entities.Configuration.SIGEBI.Domain.Base;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SIGEBI.Domain.Entities.Configuration
 {
-    internal class Reservations
+    public class Reservation : ReservationBase
     {
+        [Column("ReservationId")]
+        [Key]
+        public override int Id { get; set; }
+
+        public int BookId { get; set; }
+        public int UserId { get; set; }
+        public int ReservationStatusId { get; set; }
+
+        public Books Book { get; set; }
+        public User User { get; set; }
+        public ReservationStatus ReservationStatus { get; set; }
     }
+
 }

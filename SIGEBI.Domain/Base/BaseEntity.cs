@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace SIGEBI.Domain.Base
 {
-   public abstract class BaseEntity<Ttype>
+    public abstract class BaseEntity<Ttype> : AuditableEntity
     {
-        public abstract Ttype ID { get; set; }
+        public abstract Ttype Id { get; set; }
     }
 }

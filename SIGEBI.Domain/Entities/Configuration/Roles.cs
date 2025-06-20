@@ -1,12 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using SIGEBI.Domain.Base;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SIGEBI.Domain.Entities.Configuration
 {
-    internal class Roles
+    public class Role : BaseEntity<int>
     {
+        [Column("RoleId")]
+        [Key]
+        public override int Id { get; set; }
+
+        public string RoleName { get; set; }
+        public string Description { get; set; }
+
+       
+        public ICollection<Users> Users { get; set; }
     }
 }
