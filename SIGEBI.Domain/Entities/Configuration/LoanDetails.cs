@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Domain.Base
+namespace SIGEBI.Domain.Entities.Configuration
 {
-    internal class BaselDgeneral
+    internal class LoanDetails
     {
     }
 }
