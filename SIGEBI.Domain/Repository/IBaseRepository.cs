@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Domain.Base
+namespace SIGEBI.Domain.Repository
 {
-    public class BaselDgeneral
+    internal interface IBaseRepository
     {
     }
 }

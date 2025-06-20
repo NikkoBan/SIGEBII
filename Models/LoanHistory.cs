@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SIGEBI.Domain.Entities
-{
+namespace Models {
     public class LoanHistory
     {
         public int HistoryId { get; set; }
@@ -19,3 +12,4 @@ namespace SIGEBI.Domain.Entities
         public string? Observations { get; set; }
     }
 }
+

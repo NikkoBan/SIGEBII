@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SIGEBI.Domain.Entities
-{
-    public class Category
+namespace Models {
+    public class Role
     {
-        public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = null!;
+        public int RoleId { get; set; }
+        public string RoleName { get; set; } = null!;
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public string CreatedBy { get; set; } = null!;

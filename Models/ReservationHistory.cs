@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
 
-namespace SIGEBI.Domain.Entities
-{
+namespace Models {
     public class ReservationHistory
     {
         public int ReservationHistoryId { get; set; }

@@ -10,7 +10,7 @@ namespace SIGEBI.Domain.Entities
     {
         public int BookId { get; set; }
         public int AuthorId { get; set; }
-        public Book? Book { get; set; }
-        public Author? Author { get; set; }
+        public virtual Book Book { get; set; } = null!;
+        public virtual Author Author { get; set; } = null!;
     }
 }
