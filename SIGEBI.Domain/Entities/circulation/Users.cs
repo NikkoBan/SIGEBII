@@ -13,7 +13,7 @@ namespace SIGEBI.Domain.Entities.circulation
         public bool IsActive { get; set; }
 
         public virtual ICollection<Loans>? Loans { get; set; } = new List<Loans>();
-        public virtual ICollection<Reservations> Reservations { get; set; } = new List<Reservations>();
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
     }
 }

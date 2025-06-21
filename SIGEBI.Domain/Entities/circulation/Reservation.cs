@@ -2,7 +2,7 @@
 
 namespace SIGEBI.Domain.Entities.circulation
 {
-    public  class Reservations : AuditEntity<int>
+    public  class Reservation : AuditEntity<int>
     {
         public override int Id { get; set; }
         public int BookId { get; set; }
