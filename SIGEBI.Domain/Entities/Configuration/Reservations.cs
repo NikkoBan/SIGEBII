@@ -18,7 +18,7 @@ namespace SIGEBI.Domain.Entities.Configuration
 
         public Books Book { get; set; }
         public User User { get; set; }
-        public ReservationStatus ReservationStatus { get; set; }
+        public ReservationStatuses ReservationStatuses { get; set; }
     }
 
 }

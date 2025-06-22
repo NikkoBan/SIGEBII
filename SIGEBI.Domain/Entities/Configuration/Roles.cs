@@ -15,6 +15,6 @@ namespace SIGEBI.Domain.Entities.Configuration
         public string Description { get; set; }
 
        
-        public ICollection<Users> Users { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }

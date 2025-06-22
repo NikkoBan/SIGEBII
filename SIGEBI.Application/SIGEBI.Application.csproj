@@ -7,4 +7,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Contracts\Repository\Books\" />
+    <Folder Include="Contracts\Service\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIGEBI.Domain\SIGEBI.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
