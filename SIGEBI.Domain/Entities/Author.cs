@@ -11,7 +11,7 @@ namespace SIGEBI.Domain.Entities
 {
     public class Author : BaseEntity<int>
     {
-        [Column("BookID")]
+        [Column("AuthorID")]
         [Key]
         public override int ID { get; set; }
         public string FirstName { get; set; } = string.Empty;

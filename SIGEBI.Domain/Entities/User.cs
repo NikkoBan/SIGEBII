@@ -22,7 +22,6 @@ namespace SIGEBI.Domain.Entities
         public ICollection<UserLogin>? UserLogins { get; set; }
         public ICollection<Loan>? Loans { get; set; }
         public ICollection<Reservation>? Reservations { get; set; }
-        public ICollection<Notification>? Notifications { get; set; }
         public ICollection<Sanction>? Sanctions { get; set; }
         public ICollection<SpecialMaterial>? RequestedSpecialMaterials { get; set; }
         public ICollection<SpecialMaterial>? ApprovedSpecialMaterials { get; set; }

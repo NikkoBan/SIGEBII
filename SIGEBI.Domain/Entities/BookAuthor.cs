@@ -11,7 +11,7 @@ namespace SIGEBI.Domain.Entities
 {
     public class BookAuthor : BaseEntity<int>
     {
-        [Column("BookID")]
+        [Column("BookAuthorID")]
         [Key]
         public override int ID { get; set; }
         public int AuthorId { get; set; }

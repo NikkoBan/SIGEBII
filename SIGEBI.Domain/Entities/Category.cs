@@ -11,7 +11,7 @@ namespace SIGEBI.Domain.Entities
 {
     public class Category : BaseEntity<int>
     {
-        [Column("LoanID")]
+        [Column("CategoryID")]
         [Key]
         public override int ID { get; set; }
         public string CategoryName { get; set; } = string.Empty;
