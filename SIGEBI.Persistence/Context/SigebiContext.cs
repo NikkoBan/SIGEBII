@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
-using SIGEBI.Domain.Entities;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SIGEBI.Persistence.Repositori;
 
 namespace SIGEBI.Domain.Context
 {
@@ -15,7 +15,5 @@ namespace SIGEBI.Domain.Context
         }
 
         public DbSet<InsuranceProvider> InsuraceProviders { get; set; }
-
     }
-
 }
