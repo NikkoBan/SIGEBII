@@ -7,7 +7,7 @@ using Thrift.Protocols.Entities;
 
 namespace SIGEBI.Domain.Base
 {
-    public abstract class AuditEntity<Tkey> : BaseEntity<TType>
+    public abstract class AuditEntity<Ttype> : BaseEntity<Ttype>
     {
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; }

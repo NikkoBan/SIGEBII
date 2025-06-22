@@ -11,7 +11,6 @@ namespace SIGEBI.Domain.Entities
 {
     public class Reservations : AuditEntity<int>
     {
-       
         public override int ID { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }

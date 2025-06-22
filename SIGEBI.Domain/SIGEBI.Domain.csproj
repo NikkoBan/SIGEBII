@@ -8,9 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Entities\Configuration\" />
-    <Folder Include="Entities\Reservation\" />
-    <Folder Include="Repository\" />
+    <Compile Remove="Entities\Configuration\**" />
+    <Compile Remove="Entities\Reservation\**" />
+    <EmbeddedResource Remove="Entities\Configuration\**" />
+    <EmbeddedResource Remove="Entities\Reservation\**" />
+    <None Remove="Entities\Configuration\**" />
+    <None Remove="Entities\Reservation\**" />
   </ItemGroup>
 
   <ItemGroup>
