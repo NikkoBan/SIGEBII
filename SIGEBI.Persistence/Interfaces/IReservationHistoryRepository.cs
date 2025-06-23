@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SIGEBI.Persistence.Context
+namespace SIGEBI.Persistence.Interfaces
 {
-    internal class DbContext
+    internal interface IReservationHistoryRepository 
     {
     }
 }

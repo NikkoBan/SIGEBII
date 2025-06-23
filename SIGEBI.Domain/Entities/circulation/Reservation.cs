@@ -9,6 +9,7 @@ namespace SIGEBI.Domain.Entities.circulation
         public int UserId { get; set; }     
         public DateTime ReservationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
+        public DateTime? ConfirmationDate { get; set; }
         public string? ReservationStatus { get; set; } 
     }
 }
