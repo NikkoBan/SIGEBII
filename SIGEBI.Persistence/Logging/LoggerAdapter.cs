@@ -9,7 +9,6 @@ namespace SIGEBI.Persistence.Logging
 
         public LoggerAdapter(ILogger<T> Logger) 
         {
-
             _logger = Logger;
         }
         public void LogError(string message, params object[] args)
