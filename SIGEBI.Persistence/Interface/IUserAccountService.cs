@@ -1,16 +1,16 @@
 ﻿using SIGEBI.Domain.Entities;
-using System.Collections.Generic;
+using SIGEBI.Persistence.Base;
 
-namespace SIGEBI.Persistence.Interface
+namespace SIGEBI.Persistence.Interfaces
 {
     public interface IUserAccountService
     {
-        bool Login(string email, string password, string ipAddress, string userAgent);
-        void Logout(int userId);
-        User? GetUserByEmail(string email);
-        IEnumerable<UserHistory> GetUserHistory(int userId);
-        void Register(User user);
-        void UpdateUser(User user);
-        void DeleteUser(int userId);
+        Task<OperationResult<bool>> LoginAsync(string email, string password, string ipAddress, string userAgent);
+        Task<OperationResult> LogoutAsync(int userId);
+        Task<User?> GetUserByEmailAsync(string email);
+        Task<IEnumerable<UserHistory>> GetUserHistoryAsync(int userId);
+        Task<OperationResult> RegisterAsync(User user);
+        Task<OperationResult> UpdateUserAsync(User user);
+        Task<OperationResult> DeleteUserAsync(int userId);
     }
 }

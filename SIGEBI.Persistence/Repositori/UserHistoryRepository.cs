@@ -1,20 +1,23 @@
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Entities;
-using SIGEBI.Persistence.Interface;
+using SIGEBI.Persistence.Base;
+using SIGEBI.Persistence.Context;
+using SIGEBI.Persistence.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SIGEBI.Persistence.Repositori
 {
-    public class UserHistoryRepository : IUserHistoryRepository
+    public class UserHistoryRepository : BaseRepository<UserHistory, int>, IUserHistoryRepository
     {
-        private readonly List<UserHistory> _histories;
-
-        public UserHistoryRepository(List<UserHistory> histories)
+        public UserHistoryRepository(SIGEBIDbContext context) : base(context)
         {
-            _histories = histories;
         }
 
-        public void Add(UserHistory history) => _histories.Add(history);
-        public IEnumerable<UserHistory> GetByUserId(int userId) => _histories.Where(h => h.UserId == userId);
+        public async Task<IEnumerable<UserHistory>> GetByUserIdAsync(int userId)
+        {
+            return await Entity.Where(h => h.UserId == userId).ToListAsync();
+        }
     }
 }

@@ -1,26 +1,22 @@
-using SIGEBI.Persistence.Interface;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using SIGEBI.Domain.Entities;
+using SIGEBI.Persistence.Base;
+using SIGEBI.Persistence.Context;
+using SIGEBI.Persistence.Interfaces;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SIGEBI.Persistence.Repositori
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : BaseRepository<User, int>, IUserRepository
     {
-        private readonly List<User> _users;
-
-        public UserRepository(List<User> users)
+        public UserRepository(SIGEBIDbContext context) : base(context)
         {
-            _users = users;
         }
 
-        public User? GetByEmail(string email) => _users.FirstOrDefault(u => u.InstitutionalEmail == email);
-        public User? GetById(int userId) => _users.FirstOrDefault(u => u.UserId == userId);
-        public IEnumerable<User> GetAll() => _users;
-        public void Add(User user) => _users.Add(user);
-        public void Update(User user)
+        public async Task<User?> GetByEmailAsync(string email)
         {
-            var idx = _users.FindIndex(u => u.UserId == user.UserId);
-            if (idx >= 0) _users[idx] = user;
+            return await Entity.FirstOrDefaultAsync(u => u.InstitutionalEmail != null && u.InstitutionalEmail.ToLower() == email.ToLower());
         }
     }
 }

@@ -10,6 +10,7 @@
   <ItemGroup>
     <Folder Include="Entities\Configuration\" />
     <Folder Include="Entities\Reservation\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

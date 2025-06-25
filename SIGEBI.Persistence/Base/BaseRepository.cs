@@ -1,82 +1,94 @@
-﻿using SIGEBI.Persistence.Interface;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using SIGEBI.Domain.Context;
+using SIGEBI.Persistence.Context;
+using SIGEBI.Persistence.Interfaces;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
-namespace SIGEBI.Persistence.Repositori
+namespace SIGEBI.Persistence.Base
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    public abstract class BaseRepository<TEntity, TType> : IBaseRepository<TEntity, TType> where TEntity : class
     {
-        protected readonly List<T> _data;
+        private readonly SIGEBIDbContext _context;
+        protected DbSet<TEntity> Entity { get; }
 
-        public BaseRepository()
+        protected BaseRepository(SIGEBIDbContext context)
         {
-            _data = new List<T>();
+            _context = context;
+            Entity = _context.Set<TEntity>();
         }
 
-        public T? GetById(int id)
+        public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter)
         {
-            // Esta es una simplificación para la simulación en memoria.
-            // En EF, sería context.Set<T>().Find(id);
-            var property = typeof(T).GetProperty(typeof(T).Name + "Id");
-            if (property == null)
-            {
-                // Fallback para propiedades con nombre 'Id' directamente
-                property = typeof(T).GetProperty("Id");
-            }
-
-            if (property == null)
-            {
-                throw new InvalidOperationException($"La entidad {typeof(T).Name} no tiene una propiedad Id definida.");
-            }
-
-            return _data.FirstOrDefault(item => (int)property.GetValue(item)! == id);
+            return await Entity.AnyAsync(filter);
         }
 
-        public IEnumerable<T> GetAll()
+        public virtual async Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>>? filter = null)
         {
-            return _data;
+            return filter != null ? await Entity.Where(filter).ToListAsync() : await Entity.ToListAsync();
         }
 
-        public void Add(T entity)
+        public virtual async Task<TEntity?> GetByIdAsync(TType id)
         {
-            // En un escenario real, la DB asignaría el ID. Aquí lo simulamos.
-            var property = typeof(T).GetProperty(typeof(T).Name + "Id");
-            if (property == null)
-            {
-                property = typeof(T).GetProperty("Id");
-            }
-            if (property != null && property.PropertyType == typeof(int))
-            {
-                int nextId = _data.Any() ? _data.Max(item => (int)property.GetValue(item)!) + 1 : 1;
-                property.SetValue(entity, nextId);
-            }
-            _data.Add(entity);
+            return await Entity.FindAsync(id);
         }
 
-        public void Update(T entity)
+        public virtual async Task<OperationResult> AddAsync(TEntity entity)
         {
-            var property = typeof(T).GetProperty(typeof(T).Name + "Id");
-            if (property == null)
+            var result = new OperationResult();
+            try
             {
-                property = typeof(T).GetProperty("Id");
+                await Entity.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
             }
-            if (property == null) return; // No se puede actualizar sin una clave
-
-            int entityId = (int)property.GetValue(entity)!;
-            var existingEntity = GetById(entityId);
-            if (existingEntity != null)
+            catch (Exception ex)
             {
-                _data[_data.IndexOf(existingEntity)] = entity; // Simple reemplazo
+                result.Success = false;
+                result.Message = $"Ocurrió un error guardando los datos: {ex.Message}";
             }
+            return result;
         }
 
-        public void Delete(int id)
+        public virtual async Task<OperationResult> UpdateAsync(TEntity entity)
         {
-            var entityToDelete = GetById(id);
-            if (entityToDelete != null)
+            var result = new OperationResult();
+            try
             {
-                _data.Remove(entityToDelete);
+                Entity.Update(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
             }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Ocurrió un error actualizando los datos: {ex.Message}";
+            }
+            return result;
+        }
+
+        public virtual async Task<OperationResult> RemoveAsync(TType id)
+        {
+            var result = new OperationResult();
+            try
+            {
+                var entity = await Entity.FindAsync(id);
+                if (entity == null)
+                {
+                    result.Success = false;
+                    result.Message = "Entidad no encontrada para eliminar.";
+                    return result;
+                }
+                Entity.Remove(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Ocurrió un error eliminando los datos: {ex.Message}";
+            }
+            return result;
         }
     }
 }
