@@ -13,7 +13,7 @@ namespace SIGEBI.Persistence.Repositories
     public class ReservationRepository : IReservationRepository
     {
         private readonly SIGEBIContext _context;
-        private readonly IAppLogger<ReservationRepository> _logger; // El profe dijo que abstrayeramos Logger siguiendo Dependendy Injection.
+        private readonly IAppLogger<ReservationRepository> _logger; 
 
         public ReservationRepository(SIGEBIContext context, IAppLogger<ReservationRepository> logger)
         {

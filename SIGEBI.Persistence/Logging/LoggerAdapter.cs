@@ -7,13 +7,19 @@ namespace SIGEBI.Persistence.Logging
     {
         private readonly ILogger<T> _logger;
 
-        public LoggerAdapter(ILogger<T> Logger) 
+        public LoggerAdapter(ILogger<T> Logger)
         {
             _logger = Logger;
         }
+
         public void LogError(string message, params object[] args)
         {
             _logger.LogError(message, args);
+        }
+
+        public void LogError(Exception ex, string message, params object[] args)
+        {
+            _logger.LogError(ex, message, args);
         }
 
         public void LogInformation(string message, params object[] args)

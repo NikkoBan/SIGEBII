@@ -1,8 +1,13 @@
-﻿using SIGEBI.Domain.Entities.circulation;
+﻿using System.Linq.Expressions;
+using SIGEBI.Domain.Base;
+using SIGEBI.Domain.Entities.circulation;
 
 namespace SIGEBI.Application.Contracts.Repositories.Reservations
 {
-    public interface IReservationHistoryRepository : IReadOnlyRepository<ReservationHistory>
+    public interface IReservationHistoryRepository 
     {
+        Task<OperationResult> GetByIdAsync(int id);
+        Task<OperationResult> GetAllAsync(Expression<Func<ReservationHistory, bool>> filter);
+        Task<bool> ExistsAsync(Expression<Func<ReservationHistory, bool>> filter);
     }
 }
