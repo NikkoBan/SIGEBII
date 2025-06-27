@@ -9,7 +9,7 @@ namespace SIGEBI.Domain.Base
         public required string UpdatedBy { get; set; }
         public bool IsDeleted { get; set; }
         public required string DeletedBy { get; set; }
-        public required string Notes { get; set; }
+        public string? Notes { get; set; }
 
     }
 }

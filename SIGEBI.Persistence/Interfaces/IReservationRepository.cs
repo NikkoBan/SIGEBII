@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SIGEBI.Application.Contracts.Repositories.Reservations;
 
 namespace SIGEBI.Persistence.Interfaces
 {
-    internal interface IReservationRepository
+    public interface IReservationRepository : SIGEBI.Application.Contracts.Repositories.Reservations.IReservationRepository
     {
     }
 }

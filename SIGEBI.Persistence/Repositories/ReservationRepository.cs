@@ -4,11 +4,11 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Contracts;
-using SIGEBI.Application.Contracts.Repositories.Reservations;
+using SIGEBI.Persistence.Interfaces;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
+using SIGEBI.Application.Contracts;
 using SIGEBI.Application.DTOs;  
 
 namespace SIGEBI.Persistence.Repositories

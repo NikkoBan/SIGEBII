@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Contracts;
-using SIGEBI.Application.Contracts.Repositories.Reservations;
+using SIGEBI.Persistence.Interfaces;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;

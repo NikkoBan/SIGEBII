@@ -1,19 +1,25 @@
-﻿using System.Linq;
+﻿using Moq;
 using System.Linq.Expressions;
 using SIGEBI.Domain.Entities.circulation;
+using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Repositories;
+using SIGEBI.Application.Contracts;
 
 namespace SIGEBI.Persistence.Test
 {
     [TestClass]
     public class ReservationRepositoryTests
     {
-        private ReservationRepository _repository =null!;
+        private ReservationRepository _repository = null!;
+        private Mock<SIGEBIContext> _mockContext; // Mock para el contexto
+        private Mock<IAppLogger<ReservationRepository>> _mockLogger;
 
         [TestInitialize]
         public void Setup()
         {
-            _repository = new ReservationRepository();
+            _mockContext = new Mock<SIGEBIContext>();
+            _mockLogger = new Mock<IAppLogger<ReservationRepository>>();
+            _repository = new ReservationRepository(_mockContext.Object, _mockLogger.Object);
         }
 
         [TestMethod]
@@ -39,22 +45,38 @@ namespace SIGEBI.Persistence.Test
         [TestMethod]
         public async Task AddAsync_ThrowsNotImplementedException()
         {
-            var reservation = new Reservation();
+            var reservation = new Reservation
+            {
+                CreatedBy = "TestUser",
+                UpdatedBy = "TestUser",
+                DeletedBy = "TestUser"
+            };
             await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _repository.AddAsync(reservation));
         }
 
         [TestMethod]
         public async Task UpdateAsync_ThrowsNotImplementedException()
         {
-            var reservation = new Reservation();
+            var reservation = new Reservation
+            {
+                CreatedBy = "TestUser",
+                UpdatedBy = "TestUser",
+                DeletedBy = "TestUser"
+            };
             await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _repository.UpdateAsync(reservation));
         }
 
         [TestMethod]
-        public async Task DeleteAsync_ThrowsNotImplementedException()
+        public async Task DisableAsync_ThrowsNotImplementedException()
         {
-            var reservation = new Reservation();
-            await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _repository.DeleteAsync(reservation));
+            var reservation = new Reservation
+            {
+                Id = 1, // Assuming Id is required for DisableAsync
+                CreatedBy = "TestUser",
+                UpdatedBy = "TestUser",
+                DeletedBy = "TestUser"
+            };
+            await Assert.ThrowsExceptionAsync<NotImplementedException>(() => _repository.DisableAsync(reservation.Id, reservation.DeletedBy));
         }
     }
 }
