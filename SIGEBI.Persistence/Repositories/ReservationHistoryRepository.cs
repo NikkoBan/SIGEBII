@@ -1,7 +1,9 @@
 ﻿using System.Linq.Expressions;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Contracts;
 using SIGEBI.Application.Contracts.Repositories.Reservations;
+using SIGEBI.Application.DTOs;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
@@ -23,19 +25,22 @@ namespace SIGEBI.Persistence.Repositories
             return await _context.ReservationHistory.AnyAsync(filter);
         }
 
-        public async Task<OperationResult> GetAllAsync(Expression<Func<ReservationHistory, bool>> filter)
+        public async Task<OperationResult> GetAllAsync(int reservationId)
         {
             OperationResult operationResult = new OperationResult();
 
             try
             {
-                _logger.LogInformation("Retrieving reservation history with filter: {@Filter}", filter);
+                _logger.LogInformation("Retrieving reservation history.");
 
-                var data = await _context.ReservationHistory.Where(filter).ToListAsync();
+                var history = await _context.Set<ReservationHistoryViewDto>()
+                    .FromSqlRaw("EXEC GetReservationHistory @ReservationId",
+                        new SqlParameter("@ReservationId", reservationId))
+                    .ToListAsync();
+                    
+                _logger.LogInformation("Reservation history records retrieved.", history);
 
-                _logger.LogInformation("Reservation history records retrieved: {@Count}", data.Count);
-
-                operationResult = OperationResult.Success("Reservation history records retrieved successfully.", data);
+                operationResult = OperationResult.Success("Reservation history records retrieved successfully.");
             }
             catch (Exception ex)
             {

@@ -7,7 +7,7 @@ namespace SIGEBI.Application.Contracts.Repositories.Reservations
     public interface IReservationHistoryRepository 
     {
         Task<OperationResult> GetByIdAsync(int id);
-        Task<OperationResult> GetAllAsync(Expression<Func<ReservationHistory, bool>> filter);
+        Task<OperationResult> GetAllAsync(int reservationId);
         Task<bool> ExistsAsync(Expression<Func<ReservationHistory, bool>> filter);
     }
 }

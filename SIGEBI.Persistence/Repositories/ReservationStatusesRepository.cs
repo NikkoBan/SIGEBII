@@ -5,6 +5,7 @@ using SIGEBI.Application.Contracts.Repositories.Reservations;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
+using SIGEBI.Application.DTOs;
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -39,8 +40,10 @@ namespace SIGEBI.Persistence.Repositories
 
             try
             {
-                _logger.LogInformation("Retrieving all reservation statuses with filter.");
-                var statuses = await _context.ReservationStatuses.Where(filter).ToListAsync();
+                _logger.LogInformation("Retrieving all reservation statuses.");
+                var statuses = await _context.Set<ReservationStatusViewDto>()
+                    .FromSqlRaw("EXEC GetReservationStatuses")
+                    .ToListAsync();
 
                 if (!statuses.Any())
                 {
@@ -48,7 +51,7 @@ namespace SIGEBI.Persistence.Repositories
                     operationResult = OperationResult.Failure("No reservation statuses found.");
                 }
 
-                _logger.LogInformation("Retrieved {Count} reservation statuses.", statuses.Count);
+                _logger.LogInformation("Retrieved reservation statuses succesfully.");
                 operationResult = OperationResult.Success("Reservation statuses retrieved successfully.", statuses);
             }
             catch (Exception ex)
