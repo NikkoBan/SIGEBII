@@ -15,7 +15,7 @@ namespace SIGEBI.Persistence.Repositori
         {
         }
 
-        public async Task<IEnumerable<UserHistory>> GetByUserIdAsync(int userId)
+        public async Task<List<UserHistory>> GetByUserIdAsync(int userId)
         {
             return await Entity.Where(h => h.UserId == userId).ToListAsync();
         }

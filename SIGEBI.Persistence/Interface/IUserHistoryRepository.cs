@@ -1,12 +1,7 @@
 ﻿using SIGEBI.Domain.Entities;
-using SIGEBI.Persistence.Base;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SIGEBI.Persistence.Interfaces;
 
-namespace SIGEBI.Persistence.Interfaces
+public interface IUserHistoryRepository : IBaseRepository<UserHistory, int>
 {
-    public interface IUserHistoryRepository : IBaseRepository<UserHistory, int>
-    {
-        Task<IEnumerable<UserHistory>> GetByUserIdAsync(int userId);
-    }
+    Task<List<UserHistory>> GetByUserIdAsync(int userId); 
 }

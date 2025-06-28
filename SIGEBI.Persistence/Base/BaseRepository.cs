@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SIGEBI.Domain.Context;
+using SIGEBI.Domain.Entities;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Interfaces;
 using System.Linq.Expressions;
