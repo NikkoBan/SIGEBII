@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Persistence.Base;
@@ -13,15 +11,67 @@ namespace SIGEBI.Persistence.Repositories
     public class BookRepository : BaseRepository<Book, int>, IBookRepository
     {
         private readonly SIGEBIDbContext _context;
-        private readonly ILogger<BookRepository> _logger;
-        private readonly IConfiguration _configuration;
 
-        public BookRepository(SIGEBIDbContext context, ILogger<BookRepository> logger, IConfiguration configuration)
-            : base(context)
+        public BookRepository(SIGEBIDbContext context) : base(context)
         {
             _context = context;
-            _logger = logger;
-            _configuration = configuration;
+        }
+
+        public async Task<Book?> GetBookByISBN(string isbn)
+        {
+            return await _context.Books
+                .Where(b => !b.Borrado && b.ISBN == isbn)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Book>> GetAvailableBooks()
+        {
+            return await _context.Books
+                .Where(b => !b.Borrado && b.Stock > 0)
+                .ToListAsync();
+        }
+
+        public async Task<List<Book>> SearchBooksByTitle(string title)
+        {
+            return await _context.Books
+                .Where(b => !b.Borrado && b.Title.ToLower().Contains(title.ToLower()))
+                .ToListAsync();
+        }
+
+        public async Task<List<Book>> GetDeletedBooks()
+        {
+            return await _context.Books
+                .Where(b => b.Borrado)
+                .ToListAsync();
+        }
+
+        public async Task<OperationResult> RestoreDeletedBook(int bookId)
+        {
+            var result = new OperationResult();
+
+            var book = await _context.Books.FindAsync(bookId);
+            if (book == null || !book.Borrado)
+            {
+                result.Success = false;
+                result.Message = "Libro no encontrado o no está eliminado.";
+                return result;
+            }
+
+            book.Borrado = false;
+
+            try
+            {
+                _context.Books.Update(book);
+                await _context.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Error restaurando libro: {ex.Message}";
+            }
+
+            return result;
         }
 
         public override async Task<bool> Exists(Expression<Func<Book, bool>> filter)
@@ -32,22 +82,11 @@ namespace SIGEBI.Persistence.Repositories
         public override async Task<List<Book>> GetAllAsync()
         {
             return await _context.Books
-                                 .Where(b => !b.Borrado)
-                                 .AsNoTracking()
-                                 .ToListAsync()
-                                 .ConfigureAwait(false);
-        }
-
-        public override async Task<OperationResult> GetAllAsync(Expression<Func<Book, bool>> filter)
-        {
-            var result = new OperationResult();
-            result.Data = await _context.Books
-                                        .Where(filter)
-                                        .AsNoTracking()
-                                        .ToListAsync()
-                                        .ConfigureAwait(false);
-            result.Success = true;
-            return result;
+                .Where(b => !b.Borrado)
+                .Include(b => b.Category)
+                .Include(b => b.Publisher)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public override async Task<Book?> GetEntityByIdAsync(int id)
@@ -55,45 +94,41 @@ namespace SIGEBI.Persistence.Repositories
             if (!RepoValidation.ValidarID(id))
                 return null;
 
-            return await _context.Books.FindAsync(id);
+            return await _context.Books
+                .Include(b => b.Category)
+                .Include(b => b.Publisher)
+                .FirstOrDefaultAsync(b => b.ID == id && !b.Borrado);
+        }
+
+        public async Task<List<Book>> GetBooksByCategory(int categoryId)
+        {
+            return await _context.Books
+                .Where(b => b.CategoryId == categoryId && !b.Borrado)
+                .Include(b => b.Publisher)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public override async Task<OperationResult> SaveEntityAsync(Book entity)
         {
             var result = new OperationResult();
-            if (!RepoValidation.ValidarLibro(entity))
-            {
-                result.Message = _configuration["ErrorBookRepository:InvalidData"]!;
-                result.Success = false;
-                return result;
-            }
-
             try
             {
-                await _context.Books.AddAsync(entity);
+                _context.Books.Add(entity);
                 await _context.SaveChangesAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorBookRepository:SaveEntityAsync"]!;
                 result.Success = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error guardando libro: {ex.Message}";
             }
-
             return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(Book entity, object repoValidation)
+        public override async Task<OperationResult> UpdateEntityAsync(Book entity)
         {
             var result = new OperationResult();
-            if (!RepoValidation.ValidarLibro(entity))
-            {
-                result.Message = _configuration["ErrorBookRepository:InvalidData"]!;
-                result.Success = false;
-                return result;
-            }
-
             try
             {
                 _context.Books.Update(entity);
@@ -102,11 +137,9 @@ namespace SIGEBI.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorBookRepository:UpdateEntityAsync"]!;
                 result.Success = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error actualizando libro: {ex.Message}";
             }
-
             return result;
         }
 
@@ -115,42 +148,16 @@ namespace SIGEBI.Persistence.Repositories
             var result = new OperationResult();
             try
             {
-                entity.Borrado = true;
-                _context.Books.Update(entity);
+                _context.Books.Remove(entity);
                 await _context.SaveChangesAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
-                result.Message = _configuration["ErrorBookRepository:RemoveEntity"]!;
                 result.Success = false;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error eliminando libro: {ex.Message}";
             }
-
             return result;
-        }
-
-        public async Task<Book?> GetBookByISBN(string isbn)
-        {
-            return await _context.Books
-                                 .AsNoTracking()
-                                 .FirstOrDefaultAsync(b => b.ISBN == isbn);
-        }
-
-        public async Task<List<Book>> GetBooksByCategory(int categoryId)
-        {
-            return await _context.Books
-                                 .AsNoTracking()
-                                 .Where(b => b.CategoryId == categoryId)
-                                 .ToListAsync();
-        }
-
-        public async Task<List<Book>> GetAvailableBooks()
-        {
-            return await _context.Books
-                                 .AsNoTracking()
-                                 .Where(b => b.AvailableCopies > 0 && b.GeneralStatus == "Disponible")
-                                 .ToListAsync();
         }
     }
 }

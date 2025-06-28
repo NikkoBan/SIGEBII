@@ -1,10 +1,6 @@
-﻿using Castle.Core.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities;
-using SIGEBI.Domain.Repository;
 using SIGEBI.Persistence.Base;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Interfaces;
@@ -15,156 +11,92 @@ namespace SIGEBI.Persistence.Repositories
     public class CategoryRepository : BaseRepository<Category, int>, ICategoryRepository
     {
         private readonly SIGEBIDbContext _context;
-        private readonly ILogger<CategoryRepository> _logger;
-        private readonly IConfiguration _configuration;
 
-        public CategoryRepository(SIGEBIDbContext context, ILogger<CategoryRepository> logger, IConfiguration configuration)
-            : base(context)
+        public CategoryRepository(SIGEBIDbContext context) : base(context)
         {
             _context = context;
-            _logger = logger;
-            _configuration = configuration;
+        }
+
+        public async Task<Category?> GetCategoryByName(string name)
+        {
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.CategoryName.ToLower() == name.ToLower());
+        }
+
+        public async Task<List<Category>> GetAllWithBooks()
+        {
+            return await _context.Categories
+                .Include(c => c.Books)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public override async Task<bool> Exists(Expression<Func<Category, bool>> filter)
         {
-            return await _context.Category.AnyAsync(filter);
+            return await _context.Categories.AnyAsync(filter);
         }
 
         public override async Task<List<Category>> GetAllAsync()
         {
-            return await _context.Category
-                                 .Where(c => !c.Borrado)
-                                 .AsNoTracking()
-                                 .ToListAsync();
-        }
-
-        public override async Task<OperationResult> GetAllAsync(Expression<Func<Category, bool>> filter)
-        {
-            var data = await _context.Category
-                                     .Where(filter)
-                                     .Where(c => !c.Borrado)
-                                     .AsNoTracking()
-                                     .ToListAsync();
-
-            return new OperationResult
-            {
-                Success = true,
-                Data = data
-            };
+            return await _context.Categories
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public override async Task<Category?> GetEntityByIdAsync(int id)
         {
-            if (!RepoValidation.ValidarID(id))
-                return null;
-
-            return await _context.Category.FindAsync(id);
-        }
-
-        public async Task<Category?> GetCategoryByNameAsync(string name)
-        {
-            return await _context.Category
-                                 .AsNoTracking()
-                                 .FirstOrDefaultAsync(c => c.CategoryName == name && !c.Borrado);
-        }
-
-        public async Task<List<Category>> GetAllActiveCategoriesAsync()
-        {
-            return await _context.Category
-                                 .Where(c => !c.Borrado)
-                                 .AsNoTracking()
-                                 .ToListAsync();
+            return await _context.Categories.FindAsync(id);
         }
 
         public override async Task<OperationResult> SaveEntityAsync(Category entity)
         {
             var result = new OperationResult();
-
-            if (string.IsNullOrWhiteSpace(entity.CategoryName))
-            {
-                result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:InvalidData"]!;
-                return result;
-            }
-
             try
             {
-                _context.Category.Add(entity);
+                _context.Categories.Add(entity);
                 await _context.SaveChangesAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:SaveEntityAsync"]!;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error guardando categoría: {ex.Message}";
             }
-
             return result;
         }
 
         public override async Task<OperationResult> UpdateEntityAsync(Category entity)
         {
             var result = new OperationResult();
-
-            if (!RepoValidation.ValidarID(entity.Id) || string.IsNullOrWhiteSpace(entity.CategoryName))
-            {
-                result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:InvalidData"]!;
-                return result;
-            }
-
             try
             {
-                _context.Category.Update(entity);
+                _context.Categories.Update(entity);
                 await _context.SaveChangesAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:UpdateEntityAsync"]!;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error actualizando categoría: {ex.Message}";
             }
-
             return result;
         }
 
         public override async Task<OperationResult> RemoveEntityAsync(Category entity)
         {
             var result = new OperationResult();
-
-            if (!RepoValidation.ValidarID(entity.Id) ||
-                !RepoValidation.ValidarID(entity.UsuarioMod) ||
-                !RepoValidation.ValidarEntidad(entity.FechaModificacion!) ||
-                !RepoValidation.ValidarID(entity.BorradoPorU) ||
-                !RepoValidation.ValidarEntidad(entity.Borrado!))
-            {
-                result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:InvalidData"]!;
-                return result;
-            }
-
             try
             {
-                _context.Category.Update(entity);
+                _context.Categories.Remove(entity);
                 await _context.SaveChangesAsync();
                 result.Success = true;
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.Message = _configuration["ErrorCategoryRepository:RemoveEntity"]!;
-                _logger.LogError(result.Message, ex.ToString());
+                result.Message = $"Error eliminando categoría: {ex.Message}";
             }
-
             return result;
-        }
-
-        Task<List<Category>> ICategoryRepository.GetAllWithBooks()
-        {
-            throw new NotImplementedException();
         }
     }
 }

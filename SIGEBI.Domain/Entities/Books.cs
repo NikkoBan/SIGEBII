@@ -29,5 +29,8 @@ namespace SIGEBI.Domain.Entities
         public ICollection<BookAuthor>? BookAuthors { get; set; }
         public ICollection<Loan>? Loans { get; set; }
         public ICollection<Reservation>? Reservations { get; set; }
+        public bool Borrado { get; set; } = false;
+        public int Stock => AvailableCopies;
+
     }
 }

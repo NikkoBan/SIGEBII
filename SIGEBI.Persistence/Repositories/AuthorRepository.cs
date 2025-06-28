@@ -10,7 +10,73 @@ namespace SIGEBI.Persistence.Repositories
 {
     public class AuthorRepository : BaseRepository<Author, int>, IAuthorRepository
     {
-        private readonly SIGEBIDbContext _context;
+        public readonly SIGEBIDbContext _context;
+
+        public override async Task<Author?> GetEntityByIdAsync(int id)
+        {
+            return await _context.Authors.FindAsync(id);
+        }
+
+        public override async Task<bool> Exists(Expression<Func<Author, bool>> filter)
+        {
+            return await _context.Authors.AnyAsync(filter);
+        }
+
+        public override async Task<List<Author>> GetAllAsync()
+        {
+            return await _context.Authors.ToListAsync();
+        }
+
+        public override async Task<OperationResult> SaveEntityAsync(Author entity)
+        {
+            var result = new OperationResult();
+            try
+            {
+                _context.Authors.Add(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Error guardando autor: {ex.Message}";
+            }
+            return result;
+        }
+
+        public override async Task<OperationResult> UpdateEntityAsync(Author entity)
+        {
+            var result = new OperationResult();
+            try
+            {
+                _context.Authors.Update(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Error actualizando autor: {ex.Message}";
+            }
+            return result;
+        }
+
+        public override async Task<OperationResult> RemoveEntityAsync(Author entity)
+        {
+            var result = new OperationResult();
+            try
+            {
+                _context.Authors.Remove(entity);
+                await _context.SaveChangesAsync();
+                result.Success = true;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = $"Error eliminando autor: {ex.Message}";
+            }
+            return result;
+        }
 
         public AuthorRepository(SIGEBIDbContext context) : base(context)
         {
@@ -50,35 +116,6 @@ namespace SIGEBI.Persistence.Repositories
             return result;
         }
 
-        public override Task<OperationResult> SaveEntityAsync(Author entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<OperationResult> UpdateEntityAsync(Author entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<Author?> GetEntityByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<List<Author>> GetAllAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<bool> Exists(Expression<Func<Author, bool>> filter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task<OperationResult> RemoveEntityAsync(Author entity)
-        {
-            throw new NotImplementedException();
-        }
     }
-}
 
+}
