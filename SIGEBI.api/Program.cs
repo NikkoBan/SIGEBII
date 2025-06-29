@@ -1,9 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using SIGEBI.Persistence.Context;
+using SIGEBI.Persistence.Interfaces;
+using SIGEBI.Persistence.Repositories;
+using SIGEBI.Application.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<SIGEBIDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+// Publishers Repository Registration
+builder.Services.AddScoped<IPublishersRepository, PublishersRepository>();
+
+// Publishers Service Registration
+builder.Services.AddScoped<IPublishersService, PublishersService>(); 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

@@ -116,6 +116,7 @@ namespace SIGEBI.Persistence.Repositories
                 target.Email = source.Email;
                 target.Website = source.Website;
                 // No se mapean las colecciones relacionadas aquí para evitar problemas de tracking.
+                /* */
             }
         }
     }
