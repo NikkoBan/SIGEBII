@@ -50,15 +50,11 @@ namespace SIGEBI.Persistence.Context
                 entity.Property(u => u.IsDeleted).IsRequired();
                 entity.Property(u => u.DeletedAt).IsRequired(false); // Anulable
                 entity.Property(u => u.DeletedBy).HasMaxLength(100).IsRequired(false); // Anulable
-
-                // Configuración de la relación One-to-Many con UserHistory
-                // Si borras un usuario, borra su historial.
-                // Si la FK en DB es NOT NULL, esto funciona si UserHistory.UserId es NOT NULL.
                 entity.HasMany(u => u.UserHistories)
                       .WithOne(uh => uh.User) // La propiedad de navegación inversa en UserHistory
                       .HasForeignKey(uh => uh.UserId)
                       .IsRequired() // UserId en UserHistory es NOT NULL
-                      .OnDelete(DeleteBehavior.Cascade); // Si borras User, se borran UserHistories asociados
+                      .OnDelete(DeleteBehavior.Cascade); 
             });
 
             // Mapeo para la entidad UserHistory (dbo.UserHistory)
@@ -68,7 +64,7 @@ namespace SIGEBI.Persistence.Context
                 entity.HasKey(uh => uh.LogId);
                 entity.Property(uh => uh.LogId).ValueGeneratedOnAdd();
 
-                entity.Property(uh => uh.UserId).IsRequired(); // FK, NOT NULL en DB
+                entity.Property(uh => uh.UserId).IsRequired();
 
                 entity.Property(uh => uh.EnteredEmail).HasMaxLength(255).IsRequired(false); // Anulable
                 entity.Property(uh => uh.AttemptDate).IsRequired();
@@ -91,10 +87,10 @@ namespace SIGEBI.Persistence.Context
                       .WithMany(u => u.UserHistories)
                       .HasForeignKey(uh => uh.UserId)
                       .IsRequired() // Coincide con NOT NULL en DB
-                      .OnDelete(DeleteBehavior.Restrict); // Evita borrado en cascada desde UserHistory si borras User.
+                      .OnDelete(DeleteBehavior.Restrict);
             });
-            /* Agrega aquí mapeos para otras entidades si las necesitas en este contexto, por ejemplo:
-             * modelBuilder.Entity<Role>(entity => { ... });
+            /* 
+               Agrega aquí mapeos para otras entidades 
             */
         }
     }

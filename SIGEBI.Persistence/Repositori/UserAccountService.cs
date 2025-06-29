@@ -64,7 +64,7 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = "System"
                 };
-                // Opcional: Validar historial antes de añadir
+                // Validar historial antes de añadir
                 // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(history);
 
@@ -95,7 +95,7 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = "System"
                 };
-                // Opcional: Validar historial antes de añadir
+                //  Validar historial antes de añadir
                 // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 return await _userHistoryRepository.AddAsync(history);
             }
@@ -114,13 +114,13 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> RegisterAsync(User user)
         {
-            // --- INICIA LA VALIDACIÓN ---
+            //  INICIA LA VALIDACIÓN
             if (!UserValidation.IsValid(user))
             {
                 // Aquí podrías ser más específico sobre qué campo falló si lo deseas
                 return OperationResult.Fail("Datos de usuario inválidos para el registro.");
             }
-            // --- TERMINA LA VALIDACIÓN ---
+            // TERMINA LA VALIDACIÓN 
 
             var existingUser = await _userRepository.GetByEmailAsync(user.InstitutionalEmail);
             if (existingUser != null)
@@ -151,7 +151,7 @@ namespace SIGEBI.Persistence.Repositori
                         CreatedAt = DateTime.Now,
                         CreatedBy = "System"
                     };
-                    // Opcional: Validar historial antes de añadir
+                    // Validar historial antes de añadir
                     // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                     var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                     if (!addHistoryResult.Success)
@@ -166,12 +166,12 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> UpdateUserAsync(User user)
         {
-            // --- INICIA LA VALIDACIÓN ---
+            // INICIA LA VALIDACIÓN
             if (!UserValidation.IsValid(user))
             {
                 return OperationResult.Fail("Datos de usuario inválidos para la actualización.");
             }
-            // --- TERMINA LA VALIDACIÓN ---
+            // TERMINA LA VALIDACIÓN
 
             var existing = await _userRepository.GetByIdAsync(user.UserId);
             if (existing == null)
@@ -206,7 +206,7 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = existing.UpdatedBy ?? "System"
                 };
-                // Opcional: Validar historial antes de añadir
+                // Validar historial antes de añadir
                 // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                 if (!addHistoryResult.Success)
@@ -243,7 +243,7 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = user.DeletedBy ?? "System"
                 };
-                // Opcional: Validar historial antes de añadir
+                // Validar historial antes de añadir
                 // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                 if (!addHistoryResult.Success)
