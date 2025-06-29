@@ -1,7 +1,7 @@
 ﻿using SIGEBI.Domain.Entities;
 using System;
 
-namespace SIGEBI.Persistence.Validations
+namespace SIGEBI.Domain.Validations
 {
     public static class RepoValidation
     {

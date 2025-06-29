@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Validations;
 using SIGEBI.Persistence.Base;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Interfaces;
 using System.Linq.Expressions;
+
 
 namespace SIGEBI.Persistence.Repositories
 {

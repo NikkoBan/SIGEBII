@@ -5,6 +5,7 @@ using SIGEBI.Persistence.Context;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
+
 namespace SIGEBI.Persistence.Base
 {
     public abstract class BaseRepository<TEntity, Ttype> : IBaseRepository<TEntity, Ttype> where TEntity : class

@@ -1,5 +1,6 @@
 ﻿using SIGEBI.Domain.Entities;
 
+
 namespace SIGEBI.Domain.Services
 {
     public interface ILoanService

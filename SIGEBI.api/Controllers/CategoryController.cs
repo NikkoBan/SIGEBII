@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Persistence.Interfaces;
-using SIGEBI.Persistence.Validations;
+using SIGEBI.Domain.Validations;
 
 namespace SIGEBI.API.Controllers
 {

@@ -11,9 +11,9 @@ namespace SIGEBI.Domain.Entities
         [Column("UserID")]
         [Key]
         public override int ID { get; set; }
-        public string FullName { get; set; }
-        public string InstitutionalEmail { get; set; }
-        public string PasswordHash { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string InstitutionalMail { get; set; } = string.Empty;
+        public string PasswordHash { get; set; } = string.Empty;
         public string? InstitutionalIdentifier { get; set; }
         public DateTime RegistrationDate { get; set; }
         public int RoleId { get; set; }

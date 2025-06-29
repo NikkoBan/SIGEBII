@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SIGEBI.Application.DTOs;
 using SIGEBI.Domain.Entities;
+using SIGEBI.Domain.Validations;
 using SIGEBI.Persistence.Interfaces;
-using SIGEBI.Persistence.Validations;
 
 namespace SIGEBI.API.Controllers
 {
@@ -37,8 +38,22 @@ namespace SIGEBI.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Book book)
+        public async Task<IActionResult> Create([FromBody] CreateBookDto dto)
         {
+            var book = new Book
+            {
+                Title = dto.Title,
+                ISBN = dto.ISBN,
+                PublicationDate = dto.PublicationDate,
+                CategoryId = dto.CategoryId,
+                PublisherId = dto.PublisherId,
+                Language = dto.Language,
+                Summary = dto.Summary,
+                TotalCopies = dto.TotalCopies,
+                AvailableCopies = dto.AvailableCopies,
+                GeneralStatus = dto.GeneralStatus
+            };
+
             if (!RepoValidation.ValidarBook(book))
                 return BadRequest("Datos del libro inválidos.");
 
