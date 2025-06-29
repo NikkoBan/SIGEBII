@@ -18,7 +18,23 @@ namespace SIGEBI.Persistence.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<BooksAuthors>()
+                .HasKey(ba => new { ba.BookId, ba.AuthorId }); // Asumiendo que BookId y AuthorId son las propiedades de la clave compuesta
+
+            modelBuilder.Entity<BooksAuthors>()
+                .HasOne(ba => ba.Books) 
+                .WithMany(b => b.BooksAuthors) 
+                .HasForeignKey(ba => ba.BookId);
+
+            modelBuilder.Entity<BooksAuthors>()
+                .HasOne(ba => ba.Authors) // Asumiendo que BooksAuthors tiene una propiedad de navegación 'Author'
+                .WithMany(a => a.BooksAuthors) // Asumiendo que Authors tiene una colección 'BooksAuthors'
+                .HasForeignKey(ba => ba.AuthorId);
+
             base.OnModelCreating(modelBuilder);
+
+
         }
+
     }
 }

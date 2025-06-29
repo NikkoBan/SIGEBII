@@ -12,7 +12,7 @@ namespace SIGEBI.Domain.Entities.Configuration
         public override int Id { get; set; }
         public string Title { get; set; }
         public string ISBN { get; set; }
-        public DateOnly? PublicationDate { get; set; }
+        public DateTime? PublicationDate { get; set; }
         public string Language { get; set; }
         public string Summary { get; set; }
         public int TotalCopies { get; set; }
@@ -25,10 +25,12 @@ namespace SIGEBI.Domain.Entities.Configuration
 
         public int PublisherId { get; set; }
         public Publisher Publisher { get; set; }
+        public ICollection<BooksAuthors> BooksAuthors { get; set; } = new List<BooksAuthors>();
+
     }
 
 
-    
 
-     
+
+
 }

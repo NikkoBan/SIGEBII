@@ -1,21 +1,17 @@
-﻿
-using SIGEBI.Domain.Base;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SIGEBI.Domain.Entities.Configuration
+namespace SIGEBI.Application.Dtos
 {
-    public class Authors : AuditableEntity 
+    public class UpdateAuthorDTO: ModifiableDTO
     {
-
         public int AuthorId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-
         public DateTime? BirthDate { get; set; }
-
         public string Nationality { get; set; }
-
-        public ICollection<BooksAuthors> BooksAuthors { get; set; } = new List<BooksAuthors>();
-
-
     }
 }
