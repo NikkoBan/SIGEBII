@@ -11,8 +11,8 @@ namespace SIGEBI.Persistence.Test
     public class ReservationRepositoryTests
     {
         private ReservationRepository _repository = null!;
-        private Mock<SIGEBIContext> _mockContext; // Mock para el contexto
-        private Mock<IAppLogger<ReservationRepository>> _mockLogger;
+        private Mock<SIGEBIContext> _mockContext = null!; // Mock para el contexto
+        private Mock<IAppLogger<ReservationRepository>> _mockLogger = null!;
 
         [TestInitialize]
         public void Setup()

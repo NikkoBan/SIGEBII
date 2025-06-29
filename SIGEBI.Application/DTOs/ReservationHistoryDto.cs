@@ -1,13 +1,13 @@
-﻿namespace SIGEBI.api.DTOs.Reservations
+﻿
+namespace SIGEBI.Application.DTOs
 {
     public class ReservationHistoryDto
     {
         public int HistoryId { get; set; }
         public int ReservationId { get; set; }
-        public int BookId { get; set; }
-        public int UserId { get; set; }
-        public ReservationStatusDto Status { get; set; } // DTO completo del estado
+        public int StatusId { get; set; }
         public DateTime ReservationDate { get; set; }
         public DateTime ExpirationDate { get; set; }
+
     }
 }

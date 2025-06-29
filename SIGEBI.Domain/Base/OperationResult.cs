@@ -12,10 +12,11 @@ namespace SIGEBI.Domain.Base
         {
             IsSuccess = isSuccess;
             Message = message;
+            Data = data;
         }
         public static OperationResult Success(string message, dynamic? data = null)
         {
-            return new OperationResult(true, message);
+            return new OperationResult(true, message, data);
         }
         public static OperationResult Failure(string message)
         {

@@ -25,7 +25,7 @@ namespace SIGEBI.Persistence.Repositories
             return await _context.ReservationHistory.AnyAsync(filter);
         }
 
-        public async Task<OperationResult> GetAllAsync(int reservationId)
+        public async Task<OperationResult> GetAllAsync()
         {
             OperationResult operationResult = new OperationResult();
 
@@ -33,9 +33,8 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Retrieving reservation history.");
 
-                var history = await _context.Set<ReservationHistoryViewDto>()
-                    .FromSqlRaw("EXEC GetReservationHistory @ReservationId",
-                        new SqlParameter("@ReservationId", reservationId))
+                var history = await _context.Set<ReservationHistoryDto>()
+                    .FromSqlRaw("EXEC GetReservationHistory")
                     .ToListAsync();
                     
                 _logger.LogInformation("Reservation history records retrieved.", history);

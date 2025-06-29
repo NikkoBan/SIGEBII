@@ -9,7 +9,7 @@ using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Application.Contracts;
-using SIGEBI.Application.DTOs;  
+using SIGEBI.Application.Validations;
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -24,30 +24,6 @@ namespace SIGEBI.Persistence.Repositories
             _logger = logger;
         }
 
-        private OperationResult ValidateReservation(Reservation entity)
-        {
-            if (entity == null)
-            {
-                return OperationResult.Failure("Reservation entity cannot be null.");
-            }
-            if (entity.BookId <= 0)
-            {
-                return OperationResult.Failure("BookId is required.");
-            }
-            if (entity.UserId <= 0)
-            {
-                return OperationResult.Failure("UserId is required.");
-            }
-            if (entity.ReservationDate < DateTime.Today)
-            {
-                return OperationResult.Failure("Reservation date cannot be in the past.");
-            }
-            if (entity.ExpirationDate <= entity.ReservationDate)
-            {
-                return OperationResult.Failure("Expiration date must be after the reservation date.");
-            }
-            return null;
-        }
         private async Task<Reservation?> FindReservationAsync(int id)
         {
             _logger.LogInformation("Searching for reservation with Id: {Id}", id);
@@ -66,14 +42,14 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Adding reservation entity: {@Reservation}", entity);
 
-                var validationResult = ValidateReservation(entity);
-                if (validationResult != null)
-                {
-                    _logger.LogError("Validation failed for reservation entity: {@Entity}", entity);
-                    return validationResult;
-                }
+                //var validationResult = Application.Validations.ReservationValidator(entity);
+                //if (validationResult != null)
+                //{
+                //    _logger.LogError("Validation failed for reservation entity: {@Entity}", entity);
+                //    return validationResult;
+                //}
 
-                entity.ReservationStatus ??= "Pending"; // Default status if not provided
+                entity.StatusId = 1; // Default status if not provided
 
                 var outputMessage = new SqlParameter("@Presult", SqlDbType.VarChar, 1000)
                 {
@@ -166,12 +142,12 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Updating reservation entity: {@Entity}", entity);
 
-                var validationResult = ValidateReservation(entity);
-                if (validationResult != null)
-                {
-                    _logger.LogError("Validation failed.");
-                    return OperationResult.Failure(ValidateReservation(entity).Message);
-                }
+                //var validationResult = ValidateReservation(entity); // no es necesario ahora que tenemos las validaciones en application layer
+                //if (validationResult != null)
+                //{
+                //    _logger.LogError("Validation failed.");
+                //    return OperationResult.Failure(ValidateReservation(entity).Message);
+                //}
 
                 await _context.Database.ExecuteSqlRawAsync("EXEC ModifyReservation @ReservationId, @BookId, @UserId, @ReservationDate, @ExpirationDate, @StatusId, @UpdatedAt, @UpdatedBy",
                     new SqlParameter("@ReservationId", entity.Id),

@@ -13,9 +13,9 @@ namespace SIGEBI.Persistence.Context
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<ReservationStatus> ReservationStatuses { get; set; }
         public DbSet<ReservationHistory> ReservationHistory { get; set; } // kinda confusing, but this is the history of reservations concerning to the 'ReservationHistory' entity.
-        public DbSet<ReservationViewDto> ReservationsView { get; set; } // This is a view model, not an entity.
-        public DbSet<ReservationStatusViewDto> ReservationStatusesView { get; set; } 
-        public DbSet<ReservationHistoryViewDto> ReservationsHistoryView { get; set; } 
+        public DbSet<ReservationDto> ReservationsView { get; set; } // This is a view model, not an entity.
+        public DbSet<ReservationStatusDto> ReservationStatusesView { get; set; }
+        public DbSet<ReservationHistoryDto> ReservationsHistoryView { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,11 +27,11 @@ namespace SIGEBI.Persistence.Context
                 .HasKey(rs => rs.Id);
             modelBuilder.Entity<ReservationHistory>()
                 .HasKey(rh => rh.HistoryId);
-            modelBuilder.Entity<ReservationViewDto>()
+            modelBuilder.Entity<ReservationDto>()
                 .HasNoKey().ToView(null); // This is a view model, not an entity
-            modelBuilder.Entity<ReservationStatusViewDto>()
+            modelBuilder.Entity<ReservationStatusDto>()
                 .HasNoKey().ToView(null); // This is a view model, not an entity
-            modelBuilder.Entity<ReservationHistoryViewDto>()
+            modelBuilder.Entity<ReservationHistoryDto>()
                 .HasNoKey().ToView(null); // This is a view model, not an entity
         }
     }
