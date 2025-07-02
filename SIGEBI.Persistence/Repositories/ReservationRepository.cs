@@ -42,13 +42,6 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Adding reservation entity: {@Reservation}", entity);
 
-                //var validationResult = Application.Validations.ReservationValidator(entity);
-                //if (validationResult != null)
-                //{
-                //    _logger.LogError("Validation failed for reservation entity: {@Entity}", entity);
-                //    return validationResult;
-                //}
-
                 entity.StatusId = 1; // Default status if not provided
 
                 var outputMessage = new SqlParameter("@Presult", SqlDbType.VarChar, 1000)
