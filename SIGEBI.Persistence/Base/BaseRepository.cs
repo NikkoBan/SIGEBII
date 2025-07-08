@@ -6,9 +6,10 @@ using SIGEBI.Application.Contracts;
 using SIGEBI.Domain.Base;
 using SIGEBI.Persistence.Context;
 
-namespace SIGEBI.Persistence.Base
+namespace SIGEBI.Persistence.Base 
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : class
+    // this class maneja operaciones cruds de forma reutilizable que hereda de la interfaz IBaseRepository from Application
+    public class BaseRepository<T> : IBaseRepository<T> where T : class 
     {
         protected readonly SIGEBIContext _context;
 

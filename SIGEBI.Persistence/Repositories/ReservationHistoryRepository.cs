@@ -31,19 +31,19 @@ namespace SIGEBI.Persistence.Repositories
 
             try
             {
-                _logger.LogInformation("Retrieving reservation history.");
+                _logger.LogInformation("Retrieving all reservation history.");
 
-                var history = await _context.Set<ReservationHistoryDto>()
-                    .FromSqlRaw("EXEC GetReservationHistory")
+                var result = await _context.ReservationHistory
+                    .FromSqlRaw("EXEC GetAllReservationHistory")
                     .ToListAsync();
-                    
-                _logger.LogInformation("Reservation history records retrieved.", history);
 
-                operationResult = OperationResult.Success("Reservation history records retrieved successfully.");
+                _logger.LogInformation("Retrieved {Count} reservation history records.", result.Count);
+
+                operationResult = OperationResult.Success("All reservation histories retrieved successfully.", result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving reservation history records.");
+                _logger.LogError(ex, "Error retrieving all reservation history records.");
                 operationResult = OperationResult.Failure("An error occurred retrieving reservation history records: " + ex.Message);
             }
             return operationResult;
@@ -55,9 +55,11 @@ namespace SIGEBI.Persistence.Repositories
 
             try
             {
-                _logger.LogInformation("Retrieving reservation history by Id: {Id}", id);
+                _logger.LogInformation("Retrieving reservation history by HistoryId: {HistoryId}", id);
 
-                var entity = await _context.ReservationHistory.FindAsync(id);
+                var entity = await _context.ReservationHistory
+                    .FromSqlRaw("EXEC GetReservationHistory @HistoryId", new SqlParameter("@HistoryId", id))
+                    .FirstOrDefaultAsync();
 
                 if (entity == null)
                 {
@@ -71,7 +73,7 @@ namespace SIGEBI.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving reservation history by Id: {Id}", id);
+                _logger.LogError(ex, "Error retrieving reservation history by Id.");
                 operationResult = OperationResult.Failure("An error occurred retrieving the reservation history record: " + ex.Message);
             }
             return operationResult;

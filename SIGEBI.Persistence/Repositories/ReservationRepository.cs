@@ -4,12 +4,13 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.Extensions.Logging;
-using SIGEBI.Persistence.Interfaces;
+using SIGEBI.Application.Contracts;
+using SIGEBI.Application.DTOs;
+using SIGEBI.Application.Validations;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
-using SIGEBI.Application.Contracts;
-using SIGEBI.Application.Validations;
+using SIGEBI.Persistence.Interfaces;
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -35,14 +36,14 @@ namespace SIGEBI.Persistence.Repositories
             }
             return reservation;
         }
-        public async Task<OperationResult> AddAsync(Reservation entity)
+        public async Task<OperationResult> AddAsync(Reservation entity, string createdBy)
         {
             OperationResult operationResult = new OperationResult();
             try
             {
                 _logger.LogInformation("Adding reservation entity: {@Reservation}", entity);
 
-                entity.StatusId = 1; // Default status if not provided
+               /* entity.StatusId = 1;*/ // Default status if not provided
 
                 var outputMessage = new SqlParameter("@Presult", SqlDbType.VarChar, 1000)
                 {
@@ -51,18 +52,14 @@ namespace SIGEBI.Persistence.Repositories
 
                 //SPs en vez de EF
                 await _context.Database.ExecuteSqlRawAsync(
-                    "EXEC CreateReservation @BookId, @UserId, @ReservationDate, @ExpirationDate, @StatusId, @CreatedAt, @CreatedBy, @Presult OUTPUT",
+                    "EXEC CreateReservation @BookId, @UserId, @CreatedBy, @Presult OUTPUT",
                     new SqlParameter("@BookId", entity.BookId),
                     new SqlParameter("@UserId", entity.UserId),
-                    new SqlParameter("@ReservationDate", entity.ReservationDate),
-                    new SqlParameter("@ExpirationDate", entity.ExpirationDate),
-                    new SqlParameter("@StatusId", entity.StatusId),
-                    new SqlParameter("@CreatedAt", DateTime.UtcNow),
-                    new SqlParameter("@CreatedBy", Environment.UserName),
+                    new SqlParameter("@CreatedBy", createdBy),
                     outputMessage
                     );
 
-                var message = outputMessage.Value?.ToString() ?? "Reservation process completed.";
+                var message = outputMessage.Value?.ToString() ?? "Reservation request process completed.";
 
 
                 _logger.LogInformation("Procedure result: {Message}", message);
@@ -86,9 +83,9 @@ namespace SIGEBI.Persistence.Repositories
 
             try
             {
-                _logger.LogInformation("Exexuting stored procedure to retrieve reservations.");
+                _logger.LogInformation("Executing stored procedure to retrieve reservations.");
 
-                var reservations = await _context.ReservationsView
+                var reservations = await _context.Set<ReservationDto>()
                     .FromSqlRaw("EXEC GetReservations")
                     .ToListAsync();
 
@@ -127,30 +124,19 @@ namespace SIGEBI.Persistence.Repositories
             }
             return operationResult;
         }
-        public async Task<OperationResult> UpdateAsync(Reservation entity)
+
+        //Nota: ACtualizar SP correspondiente a este metodo. y arreglarlo aca, en servicio y controlador.
+        public async Task<OperationResult> UpdateAsync(int reservationId, int bookId)  
         {
             OperationResult operationResult = new OperationResult();
 
             try
             {
-                _logger.LogInformation("Updating reservation entity: {@Entity}", entity);
+                _logger.LogInformation("Updating reservation entity: {@Entity}", reservationId);
 
-                //var validationResult = ValidateReservation(entity); // no es necesario ahora que tenemos las validaciones en application layer
-                //if (validationResult != null)
-                //{
-                //    _logger.LogError("Validation failed.");
-                //    return OperationResult.Failure(ValidateReservation(entity).Message);
-                //}
-
-                await _context.Database.ExecuteSqlRawAsync("EXEC ModifyReservation @ReservationId, @BookId, @UserId, @ReservationDate, @ExpirationDate, @StatusId, @UpdatedAt, @UpdatedBy",
-                    new SqlParameter("@ReservationId", entity.Id),
-                    new SqlParameter("@BookId", entity.BookId),
-                    new SqlParameter("@UserId", entity.UserId),
-                    new SqlParameter("@ReservationDate", entity.ReservationDate),
-                    new SqlParameter("@ExpirationDate", entity.ExpirationDate),
-                    new SqlParameter("@StatusId", entity.StatusId), // Handle nulls
-                    new SqlParameter("@UpdatedAt", DateTime.UtcNow),
-                    new SqlParameter("@UpdatedBy", Environment.UserName)
+                await _context.Database.ExecuteSqlRawAsync("EXEC ModifyReservation @ReservationId, @BookId",
+                    new SqlParameter("@ReservationId", reservationId),
+                    new SqlParameter("@BookId", bookId)
                 );
 
                 _logger.LogInformation("Reservation updated successfully: {@Entity}");
@@ -158,7 +144,7 @@ namespace SIGEBI.Persistence.Repositories
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating reservation entity: {@Entity}", entity);
+                _logger.LogError(ex, "Error updating reservation entity: {@Entity}", reservationId);
                 operationResult = OperationResult.Failure("An error occurred updating the reservation entity: " + ex.Message);
             }
 
@@ -177,7 +163,7 @@ namespace SIGEBI.Persistence.Repositories
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC DisableReservation @ReservationId, @DeletedBy, @Presult OUTPUT",
                     new SqlParameter("@ReservationId", reservationId),
-                    new SqlParameter("@DeletedBy", Environment.UserName),
+                    new SqlParameter("@DeletedBy", deletedBy),
                     outputMessage
                 );
 
@@ -193,7 +179,7 @@ namespace SIGEBI.Persistence.Repositories
             }
             return operationResult;
         }
-        public async Task<OperationResult> ConfirmReservationAsync(int reservationId)
+        public async Task<OperationResult> ConfirmReservationAsync(int reservationId, string confirmedBy) //tampoco va en el API endpoint.
         {
             OperationResult operationResult = new OperationResult();
             try
@@ -203,7 +189,7 @@ namespace SIGEBI.Persistence.Repositories
                 await _context.Database.ExecuteSqlRawAsync(
                     "EXEC ConfirmReservation @ReservationId, @ConfirmedBy",
                     new SqlParameter("@ReservationId", reservationId),
-                    new SqlParameter("@ConfirmedBy", Environment.UserName)
+                    new SqlParameter("@ConfirmedBy", confirmedBy)
                 );
 
                 operationResult = OperationResult.Success("Reservation confirmed successfully.");
@@ -217,7 +203,7 @@ namespace SIGEBI.Persistence.Repositories
             return operationResult;
 
         }
-        public async Task<OperationResult> ExpireConfirmedReservationsAsync()
+        public async Task<OperationResult> ExpireConfirmedReservationsAsync() // tampoco va en el API endpoint. 
         {
             OperationResult operationResult = new OperationResult();
             try
