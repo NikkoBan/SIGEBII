@@ -2,20 +2,13 @@
 using System.Linq.Expressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Contracts;
-using SIGEBI.Application.DTOs;
-using SIGEBI.Application.Validations;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
-<<<<<<< HEAD
-using SIGEBI.Application.Contracts;
-using SIGEBI.Application.DTOs;  
-=======
 using SIGEBI.Persistence.Interfaces;
->>>>>>> c9a5f6 (Fix: cambios en capa de persistencia)
+// c9a5f6 (Fix: cambios en capa de persistencia)
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -72,18 +65,8 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Adding reservation entity: {@Reservation}", entity);
 
-<<<<<<< HEAD
-                var validationResult = ValidateReservation(entity);
-                if (validationResult != null)
-                {
-                    _logger.LogError("Validation failed for reservation entity: {@Entity}", entity);
-                    return validationResult;
-                }
-
-                entity.ReservationStatus ??= "Pending"; // Default status if not provided
-=======
                /* entity.StatusId = 1;*/ // Default status if not provided
->>>>>>> c9a5f6 (Fix: cambios en capa de persistencia)
+// c9a5f6 (Fix: cambios en capa de persistencia)
 
                 var outputMessage = new SqlParameter("@Presult", SqlDbType.VarChar, 1000)
                 {
@@ -174,28 +157,10 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Updating reservation entity: {@Entity}", reservationId);
 
-<<<<<<< HEAD
-                var validationResult = ValidateReservation(entity);
-                if (validationResult != null)
-                {
-                    _logger.LogError("Validation failed.");
-                    return OperationResult.Failure(ValidateReservation(entity).Message);
-                }
-
-                await _context.Database.ExecuteSqlRawAsync("EXEC ModifyReservation @ReservationId, @BookId, @UserId, @ReservationDate, @ExpirationDate, @StatusId, @UpdatedAt, @UpdatedBy",
-                    new SqlParameter("@ReservationId", entity.Id),
-                    new SqlParameter("@BookId", entity.BookId),
-                    new SqlParameter("@UserId", entity.UserId),
-                    new SqlParameter("@ReservationDate", entity.ReservationDate),
-                    new SqlParameter("@ExpirationDate", entity.ExpirationDate),
-                    new SqlParameter("@StatusId", entity.StatusId), // Handle nulls
-                    new SqlParameter("@UpdatedAt", DateTime.UtcNow),
-                    new SqlParameter("@UpdatedBy", Environment.UserName)
-=======
                 await _context.Database.ExecuteSqlRawAsync("EXEC ModifyReservation @ReservationId, @BookId",
                     new SqlParameter("@ReservationId", reservationId),
                     new SqlParameter("@BookId", bookId)
->>>>>>> c9a5f6 (Fix: cambios en capa de persistencia)
+/// c9a5f6 (Fix: cambios en capa de persistencia)
                 );
 
                 _logger.LogInformation("Reservation updated successfully: {@Entity}");

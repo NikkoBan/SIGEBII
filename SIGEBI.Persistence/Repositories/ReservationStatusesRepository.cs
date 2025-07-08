@@ -41,11 +41,9 @@ namespace SIGEBI.Persistence.Repositories
             try
             {
                 _logger.LogInformation("Retrieving all reservation statuses.");
-<<<<<<< HEAD
-                var statuses = await _context.Set<ReservationStatusViewDto>()
-=======
-                var statuses = await _context.Set<ReservationDto>()
->>>>>>> c9a5f6 (Fix: cambios en capa de persistencia)
+
+                var statuses = await _context.Set<ReservationStatus>()
+// (Fix: cambios en capa de persistencia)
                     .FromSqlRaw("EXEC GetReservationStatuses")
                     .ToListAsync();
 

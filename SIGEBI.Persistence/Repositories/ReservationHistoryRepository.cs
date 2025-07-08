@@ -33,14 +33,8 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Retrieving all reservation history.");
 
-<<<<<<< HEAD
-                var history = await _context.Set<ReservationHistoryViewDto>()
-                    .FromSqlRaw("EXEC GetReservationHistory @ReservationId",
-                        new SqlParameter("@ReservationId", reservationId))
-=======
                 var result = await _context.ReservationHistory
                     .FromSqlRaw("EXEC GetAllReservationHistory")
->>>>>>> c9a5f6 (Fix: cambios en capa de persistencia)
                     .ToListAsync();
 
                 _logger.LogInformation("Retrieved {Count} reservation history records.", result.Count);
