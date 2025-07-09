@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.DTOs;
-using SIGEBI.Application.Services;
+using SIGEBI.Application.DTOs.PublishersDTOs;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities;
 using SIGEBI.Persistence.Interfaces;
@@ -24,8 +25,7 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var publishers = await _publishersService.GetAllAsync();
-            var dtos = publishers.Select(p => p.ToDto()).ToList();
-            return Ok(dtos);
+            return Ok(publishers);
         }
 
         // GET: api/Publishers/5
@@ -36,48 +36,52 @@ namespace SIGEBI.api.Controllers
             if (publisher == null)
                 return NotFound(new OperationResult { Success = false, Message = "Editorial no encontrada." });
 
-            return Ok(publisher.ToDto());
+            return Ok(publisher);
         }
 
         // POST: api/Publishers
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] PublisherCreateUpdateDto dto)
+        public async Task<IActionResult> Create([FromBody] CreationPublisherDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var entity = dto.ToEntity();
-            var result = await _publishersService.CreateAsync(entity);
+            var result = await _publishersService.CreateAsync(dto);
             if (!result.Success)
                 return BadRequest(result);
 
-            return CreatedAtAction(nameof(GetById), new { id = entity.ID }, entity.ToDto());
+            
+            return Ok(result);
         }
 
         // PUT: api/Publishers/5
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] PublisherCreateUpdateDto dto)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdatePublisherDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var entity = await _publishersService.GetByIdAsync(id);
-            if (entity == null)
-                return NotFound(new OperationResult { Success = false, Message = "Editorial no encontrada." });
+            if (dto.Id != id)
+                return BadRequest(new OperationResult { Success = false, Message = "El ID de la URL no coincide con el del cuerpo." });
 
-            dto.MapToEntity(entity);
-            var result = await _publishersService.UpdateAsync(entity);
+            var result = await _publishersService.UpdateAsync(dto);
             if (!result.Success)
-                return BadRequest(result);
+                return NotFound(result);
 
-            return Ok(entity.ToDto());
+            return Ok(result);
         }
 
         // DELETE: api/Publishers/5
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromBody] RemovePublisherDto dto)
         {
-            var result = await _publishersService.DeleteAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (dto.Id != id)
+                return BadRequest(new OperationResult { Success = false, Message = "El ID de la URL no coincide con el del cuerpo." });
+
+            var result = await _publishersService.DeleteAsync(dto);
             if (!result.Success)
                 return NotFound(result);
 

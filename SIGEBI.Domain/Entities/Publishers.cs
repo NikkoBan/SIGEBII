@@ -11,16 +11,15 @@ namespace SIGEBI.Domain.Entities
 {
     public class Publishers : AuditEntity<int>
     {
-
         [Key]
         [Column("PublisherId")]
         public override int ID { get; set; }
-        public string PublisherName { get; set; }
+        public string PublisherName { get; set; } = string.Empty;
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
         public string? Website { get; set; }
-        public ICollection<Books>? Books { get; set; } = new List<Books>();
+        public ICollection<Books>? Books { get; set; }
     }
 }
 

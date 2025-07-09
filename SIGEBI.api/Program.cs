@@ -3,6 +3,8 @@ using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Interfaces;
 using SIGEBI.Persistence.Repositories;
 using SIGEBI.Application.Services;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.IOC.Dependencies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,13 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SIGEBIDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Publishers Repository Registration
-builder.Services.AddScoped<IPublishersRepository, PublishersRepository>();
+// Registro centralizado de dependencias del módulo Publishers
+builder.Services.AddPublishersDependencies();
 
-// Publishers Service Registration
-builder.Services.AddScoped<IPublishersService, PublishersService>(); 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Otros servicios 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

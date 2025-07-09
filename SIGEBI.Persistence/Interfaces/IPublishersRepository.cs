@@ -12,5 +12,9 @@ namespace SIGEBI.Persistence.Interfaces
     {
         Task<List<Publishers>> SearchByNameAsync(string name);
         Task<Publishers?> GetByEmailAsync(string email);
+        
+        Task<bool> ExistsByNameOrEmailAsync(string name, string email);
+        Task<bool> ExistsByNameOrEmailExceptIdAsync(string name, string email, int excludeId);
+
     }
 }

@@ -115,8 +115,20 @@ namespace SIGEBI.Persistence.Repositories
                 target.PhoneNumber = source.PhoneNumber;
                 target.Email = source.Email;
                 target.Website = source.Website;
-                // No se mapean las colecciones relacionadas aquí para evitar problemas de tracking.
+                
                 /* */
+               
             }
+        public async Task<bool> ExistsByNameOrEmailAsync(string name, string email)
+        {
+            return await _dbContext.Publishers
+                .AnyAsync(p => p.PublisherName == name || p.Email == email);
         }
+
+        public async Task<bool> ExistsByNameOrEmailExceptIdAsync(string name, string email, int excludeId)
+        {
+            return await _dbContext.Publishers
+                .AnyAsync(p => (p.PublisherName == name || p.Email == email) && p.ID != excludeId);
+        }
+    }
     }
