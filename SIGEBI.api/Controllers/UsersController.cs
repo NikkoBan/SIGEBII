@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Domain.Entities;
-using SIGEBI.Persistence.Interfaces;
+using SIGEBI.Application.DTOsAplication.UserDTOs;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Persistence.Base;
+using SIGEBI.Persistence.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System;
 
 namespace SIGEBI.API.Controllers
 {
@@ -12,61 +13,57 @@ namespace SIGEBI.API.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly IUserAccountService _userAccountService;
 
-        public UsersController(IUserRepository userRepository, IUserAccountService userAccountService)
+        public UsersController(IUserService userService, IUserAccountService userAccountService)
         {
-            _userRepository = userRepository;
+            _userService = userService;
             _userAccountService = userAccountService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDisplayDto>>> GetUsers()
         {
-            var users = await _userRepository.GetAllAsync();
-            return Ok(users);
+            var result = await _userService.GetAllUsersAsync();
+            if (!result.Success)
+            {
+                return StatusCode(result.StatusCode ?? 500, result);
+            }
+            return Ok(result.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDisplayDto>> GetUser(int id)
         {
-            var user = await _userRepository.GetByIdAsync(id);
-
-            if (user == null)
+            var result = await _userService.GetUserByIdAsync(id);
+            if (!result.Success)
             {
-                return NotFound("Usuario no encontrado.");
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-
-            return Ok(user);
+            return Ok(result.Data);
         }
 
         [HttpGet("email/{email}")]
-        public async Task<ActionResult<User>> GetUserByEmail(string email)
+        public async Task<ActionResult<UserDisplayDto>> GetUserByEmail(string email)
         {
-            var user = await _userAccountService.GetUserByEmailAsync(email);
-            if (user == null)
+            var result = await _userService.GetUserByEmailAsync(email);
+            if (!result.Success)
             {
-                return NotFound("Usuario no encontrado por email.");
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-            return Ok(user);
+            return Ok(result.Data);
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<OperationResult>> RegisterUser([FromBody] User user)
+        public async Task<ActionResult<OperationResult<UserDisplayDto>>> RegisterUser([FromBody] UserCreationDto userDto)
         {
-            if (string.IsNullOrWhiteSpace(user.InstitutionalEmail) || string.IsNullOrWhiteSpace(user.PasswordHash) || string.IsNullOrWhiteSpace(user.FullName))
+            var result = await _userService.CreateUserAsync(userDto);
+            if (!result.Success)
             {
-                return BadRequest(OperationResult.Fail("Email, contraseña y nombre completo son requeridos para el registro."));
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-
-            var result = await _userAccountService.RegisterAsync(user);
-
-            if (result.Success)
-            {
-                return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, OperationResult.Ok("Usuario registrado exitosamente."));
-            }
-            return BadRequest(result);
+            return CreatedAtAction(nameof(GetUser), new { id = result.Data!.UserId }, result);
         }
 
         [HttpPost("login")]
@@ -84,56 +81,32 @@ namespace SIGEBI.API.Controllers
 
             if (result.Success)
             {
-                /* 
-                   Cuando el login es exitoso, dirige al usuario al menú principal de la biblioteca. 
-
-                   Esto es un ejemplo conceptual. En una API REST, no "redireccionas" directamente a una página.
-                   Generalmente, la API devolvería un token de autenticación (ej. JWT) y la aplicación cliente (web/móvil)
-                   usaría ese token para acceder a recursos protegidos y manejaría la navegación a su "menú principal".
-                   Para el propósito de esta solicitud, el "redireccionamiento" se traduce en devolver un 200 OK
-                   que la aplicación cliente interpretaría como luz verde para mostrar la interfaz de la biblioteca.
-
-                */
+                /* Cuando el login es exitoso, dirige al usuario al menú principal de la biblioteca. */
                 return Ok(result);
             }
             return Unauthorized(result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, [FromBody] User user)
+        public async Task<IActionResult> PutUser(int id, [FromBody] UserUpdateDto userDto)
         {
-            if (id != user.UserId)
+            var result = await _userService.UpdateUserAsync(id, userDto);
+            if (!result.Success)
             {
-                return BadRequest(OperationResult.Fail("El ID de la ruta no coincide con el ID del usuario en el cuerpo de la solicitud."));
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-
-            var result = await _userAccountService.UpdateUserAsync(user);
-
-            if (result.Success)
-            {
-                return NoContent();
-            }
-            if (result.Message != null && result.Message.Contains("Usuario no encontrado"))
-            {
-                return NotFound(result);
-            }
-            return BadRequest(result);
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var result = await _userAccountService.DeleteUserAsync(id);
-
-            if (result.Success)
+            var result = await _userService.DeleteUserAsync(id);
+            if (!result.Success)
             {
-                return NoContent();
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-            if (result.Message != null && result.Message.Contains("Usuario no encontrado"))
-            {
-                return NotFound(result);
-            }
-            return BadRequest(result);
+            return NoContent();
         }
     }
 

@@ -1,6 +1,8 @@
 ﻿using SIGEBI.Persistence.Base;
 using System.Linq.Expressions;
-
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
 
 namespace SIGEBI.Persistence.Interfaces
 {

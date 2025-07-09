@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Domain.Entities;
-using SIGEBI.Persistence.Interfaces;
+using SIGEBI.Application.DTOsAplication.UserHistoryDTOs;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Persistence.Base;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SIGEBI.Persistence.Base;
-using System;
 
 namespace SIGEBI.API.Controllers
 {
@@ -13,75 +12,66 @@ namespace SIGEBI.API.Controllers
     [Route("api/[controller]")]
     public class UserHistoryController : ControllerBase
     {
-        private readonly IUserHistoryRepository _userHistoryRepository;
+        private readonly IUserHistoryService _userHistoryService;
 
-        public UserHistoryController(IUserHistoryRepository userHistoryRepository)
+        public UserHistoryController(IUserHistoryService userHistoryService)
         {
-            _userHistoryRepository = userHistoryRepository;
+            _userHistoryService = userHistoryService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserHistory>>> GetAllUserHistory()
+        public async Task<ActionResult<IEnumerable<UserHistoryDisplayDto>>> GetAllUserHistory()
         {
-            var history = await _userHistoryRepository.GetAllAsync();
-            return Ok(history);
+            var result = await _userHistoryService.GetAllUserHistoryAsync();
+            if (!result.Success)
+            {
+                return StatusCode(result.StatusCode ?? 500, result);
+            }
+            return Ok(result.Data);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserHistory>> GetUserHistory(int id)
+        public async Task<ActionResult<UserHistoryDisplayDto>> GetUserHistory(int id)
         {
-            var entry = await _userHistoryRepository.GetByIdAsync(id);
-            if (entry == null)
+            var result = await _userHistoryService.GetUserHistoryByIdAsync(id);
+            if (!result.Success)
             {
-                return NotFound("Entrada de historial no encontrada.");
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-            return Ok(entry);
+            return Ok(result.Data);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<UserHistory>>> GetUserHistoryByUserId(int userId)
+        public async Task<ActionResult<IEnumerable<UserHistoryDisplayDto>>> GetUserHistoryByUserId(int userId)
         {
-            var history = await _userHistoryRepository.GetByUserIdAsync(userId);
-            if (history == null || !history.Any())
+            var result = await _userHistoryService.GetUserHistoryByUserIdAsync(userId);
+            if (!result.Success)
             {
-                return NotFound("No se encontró historial para el usuario especificado.");
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-            return Ok(history);
+            return Ok(result.Data);
         }
 
         [HttpPost]
-        public async Task<ActionResult<OperationResult>> PostUserHistory([FromBody] UserHistory userHistory)
+        public async Task<ActionResult<OperationResult<UserHistoryDisplayDto>>> PostUserHistory([FromBody] UserHistoryCreationDto historyDto)
         {
-            if (userHistory == null || userHistory.UserId <= 0 || string.IsNullOrWhiteSpace(userHistory.EnteredEmail))
+            var result = await _userHistoryService.CreateUserHistoryAsync(historyDto);
+            if (!result.Success)
             {
-                return BadRequest(OperationResult.Fail("Datos de historial inválidos. UserId y EnteredEmail son requeridos."));
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-
-            userHistory.AttemptDate = DateTime.Now;
-
-            var result = await _userHistoryRepository.AddAsync(userHistory);
-
-            if (result.Success)
-            {
-                return CreatedAtAction(nameof(GetUserHistory), new { id = ((UserHistory)result.Data!).LogId }, result);
-            }
-            return BadRequest(result);
+            return CreatedAtAction(nameof(GetUserHistory), new { id = result.Data!.LogId }, result);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUserHistory(int id)
         {
-            var result = await _userHistoryRepository.RemoveAsync(id);
-
-            if (result.Success)
+            var result = await _userHistoryService.DeleteUserHistoryAsync(id);
+            if (!result.Success)
             {
-                return NoContent();
+                return StatusCode(result.StatusCode ?? 500, result);
             }
-            if (result.Message != null && result.Message.Contains("Entidad no encontrada"))
-            {
-                return NotFound(result);
-            }
-            return BadRequest(result);
+            return NoContent();
         }
     }
 }

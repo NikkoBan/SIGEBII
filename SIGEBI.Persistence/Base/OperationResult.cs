@@ -61,7 +61,7 @@ namespace SIGEBI.Persistence.Base
 
     public class OperationResult<T> : OperationResult
     {
-        public new T? Data { get; set; } // Oculta la propiedad Data de la base y la tipa
+        public new T? Data { get; set; }
 
         public OperationResult() : base() { }
         public OperationResult(string errorMessage) : base(errorMessage) { }

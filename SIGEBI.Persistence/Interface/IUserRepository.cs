@@ -1,5 +1,6 @@
 ﻿using SIGEBI.Domain.Entities;
 using SIGEBI.Persistence.Base;
+using System.Threading.Tasks;
 
 namespace SIGEBI.Persistence.Interfaces
 {

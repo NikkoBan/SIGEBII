@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SIGEBI.Application.Validation; 
+using SIGEBI.Application.Validation;
 
 namespace SIGEBI.Persistence.Repositori
 {
@@ -30,6 +30,8 @@ namespace SIGEBI.Persistence.Repositori
             try
             {
                 user = await _userRepository.GetByEmailAsync(email);
+                // NOTA DE SEGURIDAD: Aquí se DEBE verificar el hash de la contraseña, no la contraseña en texto plano.
+                // Instala BCrypt.Net-Core y usa: BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)
                 isValid = user != null && user.PasswordHash == password && user.IsActive;
 
                 if (!isValid)
@@ -64,8 +66,6 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = "System"
                 };
-                // Validar historial antes de añadir
-                // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(history);
 
                 if (!addHistoryResult.Success)
@@ -95,8 +95,6 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = "System"
                 };
-                //  Validar historial antes de añadir
-                // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 return await _userHistoryRepository.AddAsync(history);
             }
             return OperationResult.Fail("Usuario no encontrado para registrar logout.");
@@ -114,13 +112,10 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> RegisterAsync(User user)
         {
-            //  INICIA LA VALIDACIÓN
             if (!UserValidation.IsValid(user))
             {
-                // Aquí podrías ser más específico sobre qué campo falló si lo deseas
                 return OperationResult.Fail("Datos de usuario inválidos para el registro.");
             }
-            // TERMINA LA VALIDACIÓN 
 
             var existingUser = await _userRepository.GetByEmailAsync(user.InstitutionalEmail);
             if (existingUser != null)
@@ -132,7 +127,9 @@ namespace SIGEBI.Persistence.Repositori
             user.IsActive = true;
             user.IsDeleted = false;
             user.CreatedAt = DateTime.Now;
-            user.CreatedBy = "System"; // Considera pasar el "CreatedBy" desde el API o contexto de seguridad
+            user.CreatedBy = "System";
+            // NOTA DE SEGURIDAD: Aquí DEBES hashear la contraseña antes de guardar.
+            // Instala BCrypt.Net-Core y usa: user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
 
             var result = await _userRepository.AddAsync(user);
 
@@ -151,8 +148,6 @@ namespace SIGEBI.Persistence.Repositori
                         CreatedAt = DateTime.Now,
                         CreatedBy = "System"
                     };
-                    // Validar historial antes de añadir
-                    // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                     var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                     if (!addHistoryResult.Success)
                     {
@@ -166,12 +161,10 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> UpdateUserAsync(User user)
         {
-            // INICIA LA VALIDACIÓN
             if (!UserValidation.IsValid(user))
             {
                 return OperationResult.Fail("Datos de usuario inválidos para la actualización.");
             }
-            // TERMINA LA VALIDACIÓN
 
             var existing = await _userRepository.GetByIdAsync(user.UserId);
             if (existing == null)
@@ -179,7 +172,6 @@ namespace SIGEBI.Persistence.Repositori
                 return OperationResult.Fail("Usuario no encontrado para actualizar.");
             }
 
-            // Actualiza solo las propiedades permitidas.
             existing.FullName = user.FullName;
             existing.InstitutionalEmail = user.InstitutionalEmail;
             existing.InstitutionalIdentifier = user.InstitutionalIdentifier;
@@ -206,8 +198,6 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = existing.UpdatedBy ?? "System"
                 };
-                // Validar historial antes de añadir
-                // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                 if (!addHistoryResult.Success)
                     Console.WriteLine($"Advertencia: Falló el registro del historial de actualización para el usuario {user.InstitutionalEmail}: {addHistoryResult.Message}");
@@ -243,8 +233,6 @@ namespace SIGEBI.Persistence.Repositori
                     CreatedAt = DateTime.Now,
                     CreatedBy = user.DeletedBy ?? "System"
                 };
-                // Validar historial antes de añadir
-                // if (!UserHistoryValidation.IsValid(history)) { /* Manejar error de validación de historial */ }
                 var addHistoryResult = await _userHistoryRepository.AddAsync(userHistory);
                 if (!addHistoryResult.Success)
                 {

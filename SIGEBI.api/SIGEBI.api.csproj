@@ -13,10 +13,15 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SIGEBI.Application\SIGEBI.Application.csproj" />
     <ProjectReference Include="..\SIGEBI.Domain\SIGEBI.Domain.csproj" />
     <ProjectReference Include="..\SIGEBI.Infraestructure\SIGEBI.Infraestructure.csproj" />
     <ProjectReference Include="..\SIGEBI.Persistence\SIGEBI.Persistence.csproj" />

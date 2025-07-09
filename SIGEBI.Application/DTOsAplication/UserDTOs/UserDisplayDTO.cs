@@ -1,4 +1,6 @@
-﻿namespace SIGEBI.Application.DTOsAplication.UserDTOs
+﻿using System;
+
+namespace SIGEBI.Application.DTOsAplication.UserDTOs
 {
     public class UserDisplayDto
     {
@@ -9,6 +11,5 @@
         public int RoleId { get; set; }
         public bool IsActive { get; set; }
         public DateTime RegistrationDate { get; set; }
-        
     }
 }
