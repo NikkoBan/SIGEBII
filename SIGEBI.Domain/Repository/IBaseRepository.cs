@@ -1,9 +1,7 @@
 ﻿using SIGEBI.Domain.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Repository
@@ -12,15 +10,15 @@ namespace SIGEBI.Domain.Repository
     /// Interfaz de herencia para los repositorios.
     /// </summary>
     /// <typeparam name="TEntity">Entidad</typeparam>
-    /// <typeparam name="Ttype">El Tipo de dato del primmary Key para realizar consulta.</typeparam>
+    /// <typeparam name="Ttype">Tipo de la llave primaria</typeparam>
     public interface IBaseRepository<TEntity, Ttype> where TEntity : class
     {
-        Task<OperationResult> SaveEntityAsync(TEntity entity);
-        Task<OperationResult> UpdateEntityAsync(TEntity entity);
+        Task<OperationResult<TEntity>> SaveEntityAsync(TEntity entity);
+        Task<OperationResult<TEntity>> UpdateEntityAsync(TEntity entity);
         Task<TEntity?> GetEntityByIdAsync(Ttype id);
         Task<List<TEntity>> GetAllAsync();
-        Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter);
+        Task<OperationResult<List<TEntity>>> GetAllAsync(Expression<Func<TEntity, bool>> filter);
         Task<bool> Exists(Expression<Func<TEntity, bool>> filter);
-        Task<OperationResult> RemoveEntityAsync(TEntity entity);
+        Task<OperationResult<TEntity>> RemoveEntityAsync(TEntity entity);
     }
 }

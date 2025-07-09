@@ -59,55 +59,46 @@ namespace SIGEBI.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(BookAuthor entity)
+        public override async Task<OperationResult<BookAuthor>> SaveEntityAsync(BookAuthor entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.BookAuthors.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<BookAuthor>.SuccessResult(entity, "BookAuthor guardado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error al guardar BookAuthor: {ex.Message}";
+                return OperationResult<BookAuthor>.FailResult($"Error al guardar BookAuthor: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(BookAuthor entity)
+        public override async Task<OperationResult<BookAuthor>> UpdateEntityAsync(BookAuthor entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.BookAuthors.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<BookAuthor>.SuccessResult(entity, "BookAuthor actualizado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error al actualizar BookAuthor: {ex.Message}";
+                return OperationResult<BookAuthor>.FailResult($"Error al actualizar BookAuthor: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(BookAuthor entity)
+        public override async Task<OperationResult<BookAuthor>> RemoveEntityAsync(BookAuthor entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.BookAuthors.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<BookAuthor>.SuccessResult(entity, "BookAuthor eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error al eliminar BookAuthor: {ex.Message}";
+                return OperationResult<BookAuthor>.FailResult($"Error al eliminar BookAuthor: {ex.Message}");
             }
-            return result;
         }
     }
 }

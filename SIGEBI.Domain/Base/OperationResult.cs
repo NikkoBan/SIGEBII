@@ -1,35 +1,31 @@
-﻿namespace SIGEBI.Domain.Base
-{
-    public class OperationResult
-    {
-        public string Message { get; set; } = string.Empty;
-        public bool Success { get; set; }
-        public dynamic? Data { get; set; } = null;
+﻿using System;
 
-        public static OperationResult SuccessResult(dynamic? data = null)
+namespace SIGEBI.Domain.Base
+{
+    public class OperationResult<T>
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public T? Data { get; set; }
+
+        public static OperationResult<T> SuccessResult(T data, string message = "Operación exitosa.")
         {
-            return new OperationResult
+            return new OperationResult<T>
             {
                 Success = true,
-                Message = "Operación exitosa.",
+                Message = message,
                 Data = data
             };
         }
 
-        public static OperationResult FailResult(string message, dynamic? data = null)
+        public static OperationResult<T> FailResult(string message, T? data = default)
         {
-            return new OperationResult
+            return new OperationResult<T>
             {
                 Success = false,
                 Message = message,
                 Data = data
             };
-            /*/ Respuesta exitosa con datos
-            var ok = OperationResult.SuccessResult(someData);
-
-            Respuesta de error con mensaje
-            var error = OperationResult.FailResult("Error al guardar el registro.");
-            /*/
         }
     }
 }

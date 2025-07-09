@@ -35,55 +35,46 @@ namespace SIGEBI.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(LoanHistory entity)
+        public override async Task<OperationResult<LoanHistory>> SaveEntityAsync(LoanHistory entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.LoanHistories.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<LoanHistory>.SuccessResult(entity, "Historial de préstamo guardado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error guardando historial de préstamo: {ex.Message}";
+                return OperationResult<LoanHistory>.FailResult($"Error guardando historial de préstamo: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(LoanHistory entity)
+        public override async Task<OperationResult<LoanHistory>> UpdateEntityAsync(LoanHistory entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.LoanHistories.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<LoanHistory>.SuccessResult(entity, "Historial de préstamo actualizado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando historial de préstamo: {ex.Message}";
+                return OperationResult<LoanHistory>.FailResult($"Error actualizando historial de préstamo: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(LoanHistory entity)
+        public override async Task<OperationResult<LoanHistory>> RemoveEntityAsync(LoanHistory entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.LoanHistories.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<LoanHistory>.SuccessResult(entity, "Historial de préstamo eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error eliminando historial de préstamo: {ex.Message}";
+                return OperationResult<LoanHistory>.FailResult($"Error eliminando historial de préstamo: {ex.Message}");
             }
-            return result;
         }
 
         public async Task<List<LoanHistory>> GetHistoryByUser(int userId)

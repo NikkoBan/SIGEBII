@@ -40,55 +40,46 @@ namespace SIGEBI.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Loan entity)
+        public override async Task<OperationResult<Loan>> SaveEntityAsync(Loan entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Loans.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Loan>.SuccessResult(entity, "Préstamo guardado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error guardando préstamo: {ex.Message}";
+                return OperationResult<Loan>.FailResult($"Error guardando préstamo: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(Loan entity)
+        public override async Task<OperationResult<Loan>> UpdateEntityAsync(Loan entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Loans.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Loan>.SuccessResult(entity, "Préstamo actualizado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando préstamo: {ex.Message}";
+                return OperationResult<Loan>.FailResult($"Error actualizando préstamo: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(Loan entity)
+        public override async Task<OperationResult<Loan>> RemoveEntityAsync(Loan entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Loans.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Loan>.SuccessResult(entity, "Préstamo eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error eliminando préstamo: {ex.Message}";
+                return OperationResult<Loan>.FailResult($"Error eliminando préstamo: {ex.Message}");
             }
-            return result;
         }
 
         public async Task<List<Loan>> GetLoansByUser(int userId)

@@ -7,4 +7,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="Validations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SIGEBI.Domain\SIGEBI.Domain.csproj" />
+    <ProjectReference Include="..\SIGEBI.Persistence\SIGEBI.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

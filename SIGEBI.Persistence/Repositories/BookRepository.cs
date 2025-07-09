@@ -7,7 +7,6 @@ using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Interfaces;
 using System.Linq.Expressions;
 
-
 namespace SIGEBI.Persistence.Repositories
 {
     public class BookRepository : BaseRepository<Book, int>, IBookRepository
@@ -47,16 +46,12 @@ namespace SIGEBI.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<OperationResult> RestoreDeletedBook(int bookId)
+        public async Task<OperationResult<Book>> RestoreDeletedBook(int bookId)
         {
-            var result = new OperationResult();
-
             var book = await _context.Books.FindAsync(bookId);
             if (book == null || !book.Borrado)
             {
-                result.Success = false;
-                result.Message = "Libro no encontrado o no está eliminado.";
-                return result;
+                return OperationResult<Book>.FailResult("Libro no encontrado o no está eliminado.");
             }
 
             book.Borrado = false;
@@ -65,15 +60,12 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _context.Books.Update(book);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Book>.SuccessResult(book, "Libro restaurado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error restaurando libro: {ex.Message}";
+                return OperationResult<Book>.FailResult($"Error restaurando libro: {ex.Message}");
             }
-
-            return result;
         }
 
         public override async Task<bool> Exists(Expression<Func<Book, bool>> filter)
@@ -111,55 +103,46 @@ namespace SIGEBI.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Book entity)
+        public override async Task<OperationResult<Book>> SaveEntityAsync(Book entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Books.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Book>.SuccessResult(entity, "Libro guardado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error guardando libro: {ex.Message}";
+                return OperationResult<Book>.FailResult($"Error guardando libro: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(Book entity)
+        public override async Task<OperationResult<Book>> UpdateEntityAsync(Book entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Books.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Book>.SuccessResult(entity, "Libro actualizado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando libro: {ex.Message}";
+                return OperationResult<Book>.FailResult($"Error actualizando libro: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(Book entity)
+        public override async Task<OperationResult<Book>> RemoveEntityAsync(Book entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Books.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Book>.SuccessResult(entity, "Libro eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error eliminando libro: {ex.Message}";
+                return OperationResult<Book>.FailResult($"Error eliminando libro: {ex.Message}");
             }
-            return result;
         }
     }
 }

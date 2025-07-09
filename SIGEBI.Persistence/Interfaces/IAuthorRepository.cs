@@ -8,6 +8,6 @@ namespace SIGEBI.Persistence.Interfaces
     {
         Task<List<Author>> GetAuthorsByNationality(string nationality);
         Task<Author?> GetAuthorByFullName(string firstName, string lastName);
-        Task<OperationResult> UpdateNationality(Author author, string newNationality);
+        Task<OperationResult<Author>> UpdateNationality(Author author, string newNationality);
     }
 }

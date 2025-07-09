@@ -22,5 +22,6 @@ namespace SIGEBI.Domain.Entities
         public string LoanStatus { get; set; } = string.Empty;
         public Book? Book { get; set; }
         public User? User { get; set; }
+        public bool Borrado { get; set; } = false;
     }
 }

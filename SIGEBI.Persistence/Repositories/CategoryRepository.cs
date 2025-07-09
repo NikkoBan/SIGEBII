@@ -48,55 +48,46 @@ namespace SIGEBI.Persistence.Repositories
             return await _context.Categories.FindAsync(id);
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Category entity)
+        public override async Task<OperationResult<Category>> SaveEntityAsync(Category entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Categories.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Category>.SuccessResult(entity, "Categoría guardada correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error guardando categoría: {ex.Message}";
+                return OperationResult<Category>.FailResult($"Error guardando categoría: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(Category entity)
+        public override async Task<OperationResult<Category>> UpdateEntityAsync(Category entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Categories.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Category>.SuccessResult(entity, "Categoría actualizada correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando categoría: {ex.Message}";
+                return OperationResult<Category>.FailResult($"Error actualizando categoría: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(Category entity)
+        public override async Task<OperationResult<Category>> RemoveEntityAsync(Category entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Categories.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Category>.SuccessResult(entity, "Categoría eliminada correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error eliminando categoría: {ex.Message}";
+                return OperationResult<Category>.FailResult($"Error eliminando categoría: {ex.Message}");
             }
-            return result;
         }
     }
 }

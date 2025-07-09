@@ -12,6 +12,11 @@ namespace SIGEBI.Persistence.Repositories
     {
         public readonly SIGEBIDbContext _context;
 
+        public AuthorRepository(SIGEBIDbContext context) : base(context)
+        {
+            _context = context;
+        }
+
         public override async Task<Author?> GetEntityByIdAsync(int id)
         {
             return await _context.Authors.FindAsync(id);
@@ -27,60 +32,46 @@ namespace SIGEBI.Persistence.Repositories
             return await _context.Authors.ToListAsync();
         }
 
-        public override async Task<OperationResult> SaveEntityAsync(Author entity)
+        public override async Task<OperationResult<Author>> SaveEntityAsync(Author entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Authors.Add(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Author>.SuccessResult(entity, "Autor guardado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error guardando autor: {ex.Message}";
+                return OperationResult<Author>.FailResult($"Error guardando autor: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> UpdateEntityAsync(Author entity)
+        public override async Task<OperationResult<Author>> UpdateEntityAsync(Author entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Authors.Update(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Author>.SuccessResult(entity, "Autor actualizado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando autor: {ex.Message}";
+                return OperationResult<Author>.FailResult($"Error actualizando autor: {ex.Message}");
             }
-            return result;
         }
 
-        public override async Task<OperationResult> RemoveEntityAsync(Author entity)
+        public override async Task<OperationResult<Author>> RemoveEntityAsync(Author entity)
         {
-            var result = new OperationResult();
             try
             {
                 _context.Authors.Remove(entity);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Author>.SuccessResult(entity, "Autor eliminado correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error eliminando autor: {ex.Message}";
+                return OperationResult<Author>.FailResult($"Error eliminando autor: {ex.Message}");
             }
-            return result;
-        }
-
-        public AuthorRepository(SIGEBIDbContext context) : base(context)
-        {
-            _context = context;
         }
 
         public async Task<List<Author>> GetAuthorsByNationality(string nationality)
@@ -98,24 +89,19 @@ namespace SIGEBI.Persistence.Repositories
                     a.LastName.ToLower() == lastName.ToLower());
         }
 
-        public async Task<OperationResult> UpdateNationality(Author author, string newNationality)
+        public async Task<OperationResult<Author>> UpdateNationality(Author author, string newNationality)
         {
-            var result = new OperationResult();
             try
             {
                 author.Nationality = newNationality;
                 _context.Authors.Update(author);
                 await _context.SaveChangesAsync();
-                result.Success = true;
+                return OperationResult<Author>.SuccessResult(author, "Nacionalidad actualizada correctamente.");
             }
             catch (Exception ex)
             {
-                result.Success = false;
-                result.Message = $"Error actualizando nacionalidad: {ex.Message}";
+                return OperationResult<Author>.FailResult($"Error actualizando nacionalidad: {ex.Message}");
             }
-            return result;
         }
-
     }
-
 }

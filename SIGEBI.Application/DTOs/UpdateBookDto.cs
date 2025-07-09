@@ -2,8 +2,12 @@
 
 namespace SIGEBI.Application.DTOs
 {
-    public class CreateBookDto
+    public class UpdateBookDto
     {
+        [Required(ErrorMessage = "El ID del libro es obligatorio.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El ID debe ser positivo.")]
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "El título es obligatorio.")]
         [StringLength(200, MinimumLength = 3, ErrorMessage = "El título debe tener entre 3 y 200 caracteres.")]
         public string Title { get; set; } = null!;
@@ -15,11 +19,11 @@ namespace SIGEBI.Application.DTOs
         public DateTime? PublicationDate { get; set; }
 
         [Required(ErrorMessage = "El ID de la categoría es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El ID de la categoría debe ser un número positivo.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El ID de la categoría debe ser positivo.")]
         public int CategoryId { get; set; }
 
         [Required(ErrorMessage = "El ID del editorial es obligatorio.")]
-        [Range(1, int.MaxValue, ErrorMessage = "El ID del editorial debe ser un número positivo.")]
+        [Range(1, int.MaxValue, ErrorMessage = "El ID del editorial debe ser positivo.")]
         public int PublisherId { get; set; }
 
         [Required(ErrorMessage = "El idioma es obligatorio.")]
