@@ -2,7 +2,7 @@
 {
     public class ReservationHistory // Guarga un registro de reservas ya finalizadas. Es una copia de la transaccion finalizada.
     {
-        public int HistoryId { get; set; }
+        public int ReservationHistoryId { get; set; }
         public int ReservationId { get; set; }
         public int BookId { get; set; } 
         public int UserId { get; set; }
