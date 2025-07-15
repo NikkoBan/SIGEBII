@@ -40,22 +40,15 @@ namespace SIGEBI.Persistence.Repositories
 
             try
             {
-                _logger.LogInformation("Retrieving all reservation statuses.");
-                var statuses = await _context.Set<ReservationDto>()
-                    .FromSqlRaw("EXEC GetReservationStatuses")
+                _logger.LogInformation("Retriving all reservations statuses.");
+
+                var statuses = await _context.ReservationStatuses
+                    .Where(filter)
                     .ToListAsync();
 
-                if (!statuses.Any())
-                {
-                    _logger.LogInformation("No reservation statuses found with the provided filter.");
-                    operationResult = OperationResult.Failure("No reservation statuses found.");
-                }
-                else
-                {
+                _logger.LogInformation("Reservation statuses retrieved: {@Data}", statuses);
 
-                    _logger.LogInformation("Retrieved reservation statuses succesfully.");
-                    operationResult = OperationResult.Success("Reservation statuses retrieved successfully.", statuses);
-                }
+                operationResult = OperationResult.Success("Reservation statuses retrieved successfully.", statuses);
             }
             catch (Exception ex)
             {

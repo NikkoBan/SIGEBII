@@ -33,13 +33,14 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Retrieving all reservation history.");
 
-                var result = await _context.ReservationHistory
-                    .FromSqlRaw("EXEC GetAllReservationHistory")
+                var historyList = await _context.ReservationHistory
+                    //.OrderByDescending(h => h.ReservationDate)
                     .ToListAsync();
 
-                _logger.LogInformation("Retrieved {Count} reservation history records.", result.Count);
+                _logger.LogInformation("Reservation history records retrieved: {@Data}", historyList);
 
-                operationResult = OperationResult.Success("All reservation histories retrieved successfully.", result);
+                operationResult = OperationResult.Success("Reservation history records retrived succesfully.", historyList);
+               
             }
             catch (Exception ex)
             {
@@ -57,15 +58,14 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogInformation("Retrieving reservation history by HistoryId: {HistoryId}", id);
 
-                var entity = await _context.ReservationHistory
-                    .FromSqlRaw("EXEC GetReservationHistory @HistoryId", new SqlParameter("@HistoryId", id))
-                    .FirstOrDefaultAsync();
+                var entity = await _context.ReservationHistory.FindAsync(id);
 
                 if (entity == null)
                 {
-                    _logger.LogWarning("Reservation history record not found for Id: {Id}", id);
-                    return OperationResult.Failure("Reservation history record not found.");
+                    _logger.LogWarning("Reservation history record with Id {Id} not found.", id);
+                    return OperationResult.Failure("Reservation history record not found");
                 }
+                
 
                 _logger.LogInformation("Reservation history record retrieved: {@Entity}", entity);
 
