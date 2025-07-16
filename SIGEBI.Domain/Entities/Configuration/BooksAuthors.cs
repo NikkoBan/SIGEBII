@@ -1,15 +1,27 @@
-﻿using SIGEBI.Domain.Base;
+﻿
 
-
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using SIGEBI.Domain.Base;
 namespace SIGEBI.Domain.Entities.Configuration
 {
-    public class BooksAuthors : AuditableEntity
+    [Table("BookAuthor")]
+    [PrimaryKey(nameof(BookId), nameof(AuthorId))]
+    public class BookAuthor : AuditableEntity
     {
-
+        //[Key]
+        [Column(Order = 0)]
         public int BookId { get; set; }
-        public Books Books { get; set; }
 
+        //[Key]
+        [Column(Order = 1)]
         public int AuthorId { get; set; }
-        public Authors Authors { get; set; }
+
+        [ForeignKey("BookId")]
+        public Books? Book { get; set; }
+
+        [ForeignKey("AuthorId")]
+        public Authors? Author { get; set; }
     }
 }

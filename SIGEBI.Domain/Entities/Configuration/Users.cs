@@ -11,19 +11,20 @@ namespace SIGEBI.Domain.Entities.Configuration
         [Key]
         public override int Id { get; set; }
 
-        public string FullName { get; set; }
-        public string InstitutionalEmail { get; set; }
-        public string PasswordHash { get; set; }
-        public string InstitutionalIdentifier { get; set; }
+        public required string FullName { get; set; }
+        public required string InstitutionalEmail { get; set; }
+        public required string PasswordHash { get; set; }
+        public required string InstitutionalIdentifier { get; set; }
         public DateTime RegistrationDate { get; set; } = DateTime.Now;
         public int RoleId { get; set; }
         public bool IsActive { get; set; } = true;
 
 
-        public Role Role { get; set; }
-        public ICollection<Loans> Loans { get; set; }
-        public ICollection<Reservation> Reservations { get; set; }
-        public ICollection<Sanction> Sanctions { get; set; }
+        public Role? Role { get; set; }
+
+        public ICollection<Loans> Loans { get; set; } = new List<Loans>();
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+        public ICollection<Sanction> Sanctions { get; set; } = new List<Sanction>();
 
     }
 }

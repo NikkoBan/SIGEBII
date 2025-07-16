@@ -1,21 +1,41 @@
-﻿using AutoMapper;
-using SIGEBI.Application.Dtos;
+﻿
+using SIGEBI.Application.Dtos.BookAuthorDTO;
 using SIGEBI.Domain.Entities.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Application.mappers
 {
-    public class BookAuthorProfile : Profile
+    public static class BookAuthorMapper
     {
-        public BookAuthorProfile()
+        public static BookAuthorDTO ToDTO(this BookAuthor entity)
         {
-            CreateMap<CreateBookAuthorDTO, BooksAuthors>();
-            CreateMap<UpdateBookAuthorDTO, BooksAuthors>(); 
-            CreateMap<BooksAuthors, BookAuthorDTO>();
+            if (entity == null) return null!;
+
+            return new BookAuthorDTO
+            {
+                BookId = entity.BookId,
+                AuthorId = entity.AuthorId
+            };
+        }
+
+        public static BookAuthor ToEntity(this CreateBookAuthorDTO dto)
+        {
+            if (dto == null) return null!;
+
+            return new BookAuthor
+            {
+                BookId = dto.BookId,
+                AuthorId = dto.AuthorId,
+               
+            };
+        }
+
+        
+        public static void UpdateEntity(this BookAuthor entity, UpdateBookAuthorDTO dto)
+        {
+            if (entity == null || dto == null) return;
+
+            entity.BookId = dto.BookId;
+            entity.AuthorId = dto.AuthorId;
         }
     }
 }

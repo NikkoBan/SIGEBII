@@ -12,12 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Repository\Books\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
   </ItemGroup>
 
 </Project>

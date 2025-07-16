@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SIGEBI.Application.Contracts.Service;
+using SIGEBI.Application.Dtos.BookAuthorDTO;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -8,36 +10,59 @@ namespace SIGEBI.api.Controllers
     [ApiController]
     public class AuthorBookController : ControllerBase
     {
-        // GET: api/<AuthorBookController>
+        private readonly IAuthorBookService _authorBookService;
+
+        public AuthorBookController(IAuthorBookService authorBookService)
+        {
+            _authorBookService = authorBookService;
+        }
+
+        // GET: api/AuthorBook
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> GetAll()
         {
-            return new string[] { "value1", "value2" };
+            var result = await _authorBookService.GetAllAsync();
+            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
         }
 
-        // GET api/<AuthorBookController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET: api/AuthorBook/{bookId}/{authorId}
+        [HttpGet("{bookId:int}/{authorId:int}")]
+        public async Task<IActionResult> GetByIds(int bookId, int authorId)
         {
-            return "value";
+            var result = await _authorBookService.CheckDuplicateBookAuthorCombinationAsync(bookId, authorId);
+            return Ok(result); // este método devuelve true/false
         }
 
-        // POST api/<AuthorBookController>
+        // POST: api/AuthorBook
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> AddRelation([FromBody] CreateBookAuthorDTO dto)
         {
+            var result = await _authorBookService.AddBookAuthorAsync(dto.BookId, dto.AuthorId);
+            return result.Success ? Ok(result) : BadRequest(result);
         }
 
-        // PUT api/<AuthorBookController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // DELETE: api/AuthorBook/{bookId}/{authorId}
+        [HttpDelete("{bookId:int}/{authorId:int}")]
+        public async Task<IActionResult> DeleteRelation(int bookId, int authorId)
         {
+            var result = await _authorBookService.DeleteByBookAndAuthorAsync(bookId, authorId);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
-        // DELETE api/<AuthorBookController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // GET: api/AuthorBook/books-by-author/{authorId}
+        [HttpGet("books-by-author/{authorId:int}")]
+        public async Task<IActionResult> GetBooksByAuthor(int authorId)
         {
+            var result = await _authorBookService.GetBooksByAuthorAsync(authorId);
+            return result.Success ? Ok(result.Data) : NotFound(result);
+        }
+
+        // GET: api/AuthorBook/authors-by-book/{bookId}
+        [HttpGet("authors-by-book/{bookId:int}")]
+        public async Task<IActionResult> GetAuthorsByBook(int bookId)
+        {
+            var result = await _authorBookService.GetAuthorsByBookAsync(bookId);
+            return result.Success ? Ok(result.Data) : NotFound(result);
         }
     }
 }

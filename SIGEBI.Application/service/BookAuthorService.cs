@@ -1,65 +1,130 @@
 ﻿
 using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Contracts.Repository;
 using SIGEBI.Application.Contracts.Service;
-using SIGEBI.Application.Dtos;
+using SIGEBI.Application.Dtos.BookAuthorDTO;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
-using AutoMapper;
+using SIGEBI.Domain.IRepository;
+
 
 namespace SIGEBI.Application.Services
 {
-    public class BookAuthorService : BaseService<BooksAuthors, CreateBookAuthorDTO, UpdateBookAuthorDTO, BookAuthorDTO>, IBookAuthorService
+    public class BookAuthorService : BaseService<BookAuthorDTO, CreateBookAuthorDTO, UpdateBookAuthorDTO, BookAuthor>, IAuthorBookService
     {
         private readonly IBookAuthorRepository _bookAuthorRepository;
-        private readonly ILogger<BookAuthorService> _logger;
+
         public BookAuthorService(
             IBookAuthorRepository bookAuthorRepository,
-            IMapper mapper,
             ILogger<BookAuthorService> logger)
-            : base(bookAuthorRepository, mapper)
+            : base(bookAuthorRepository, logger)
         {
             _bookAuthorRepository = bookAuthorRepository;
-            _logger = logger;
         }
 
-        public async Task<OperationResult> AddBookAuthorAsync(CreateBookAuthorDTO dto)
+        
+
+        public async Task<OperationResult> CheckDuplicateBookAuthorCombinationAsync(int bookId, int authorId)
         {
             try
             {
-              
-                bool isDuplicate = await _bookAuthorRepository.CheckDuplicateBookAuthorCombinationAsync(dto.BookId, dto.AuthorId);
-                if (isDuplicate)
-                {
-                    _logger.LogWarning($"Intento de añadir combinación Libro-Autor fallido: Combinación duplicada para Libro ID {dto.BookId}, Autor ID {dto.AuthorId}.");
-                    return new OperationResult { Success = false, Message = "Esta combinación de Libro y Autor ya existe." };
-                }
-
-                var result = await base.CreateAsync(dto); 
-
-                if (result.Success)
-                {
-                    _logger.LogInformation($"Combinación Libro-Autor {dto.BookId}-{dto.AuthorId} añadida exitosamente.");
-                }
-                else
-                {
-                    _logger.LogError($"Fallo al añadir combinación Libro-Autor {dto.BookId}-{dto.AuthorId}: {result.Message}");
-                }
-                return result;
+                bool exists = await _bookAuthorRepository.CheckDuplicateBookAuthorCombinationAsync(bookId, authorId);
+                return exists
+                    ? OperationResult.SuccessResult(true)
+                    : OperationResult.SuccessResult(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Excepción al intentar añadir combinación Libro-Autor {dto.BookId}-{dto.AuthorId}.");
-                return new OperationResult { Success = false, Message = $"Error inesperado al añadir la combinación Libro-Autor: {ex.Message}" };
+                _logger.LogError(ex, $"Error verificando combinación libro {bookId} - autor {authorId}");
+                return OperationResult.FailureResult(ex.Message);
             }
         }
-            public override async Task<OperationResult> DeleteAsync(int id)
+
+        public async Task<OperationResult> DeleteByBookAndAuthorAsync(int bookId, int authorId)
+        {
+            try
             {
-            
-            _logger.LogWarning($"Advertencia: Llamada a DeleteAsync genérico para BooksAuthors con ID simple {id}. " +
-                                "Considera implementar un método de eliminación por clave compuesta (BookId, AuthorId) si es necesario.");
-            return await base.DeleteAsync(id); 
+                return await _bookAuthorRepository.DeleteByBookAndAuthorAsync(bookId, authorId);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error eliminando relación libro {bookId} - autor {authorId}");
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
+
+        public async Task<OperationResult> GetAuthorsByBookAsync(int bookId)
+        {
+            try
+            {
+                return await _bookAuthorRepository.GetAuthorsByBookAsync(bookId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error obteniendo autores para libro {bookId}");
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
+
+        public async Task<OperationResult> GetBooksByAuthorAsync(int authorId)
+        {
+            try
+            {
+                return await _bookAuthorRepository.GetBooksByAuthorAsync(authorId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error obteniendo libros para autor {authorId}");
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
+
+        public async Task<OperationResult> AddBookAuthorAsync(int bookId, int authorId)
+        {
+            try
+            {
+                return await _bookAuthorRepository.AddBookAuthorAsync(bookId, authorId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error creando relación libro {bookId} - autor {authorId}");
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
+
+        protected override BookAuthorDTO MapToDto(BookAuthor entity)
+        {
+            return new BookAuthorDTO
+            {
+                BookId = entity.BookId,
+                AuthorId = entity.AuthorId
+            };
+        }
+
+        protected override IEnumerable<BookAuthorDTO> MapToDtoList(IEnumerable<BookAuthor> entities)
+        {
+            var list = new List<BookAuthorDTO>();
+            foreach (var entity in entities)
+            {
+                list.Add(MapToDto(entity));
+            }
+            return list;
+        }
+
+        protected override BookAuthor MapToEntity(CreateBookAuthorDTO dto)
+        {
+            return new BookAuthor
+            {
+                BookId = dto.BookId,
+                AuthorId = dto.AuthorId,
+               
+            };
+        }
+
+        protected override BookAuthor MapToEntity(UpdateBookAuthorDTO dto, BookAuthor entity)
+        {
+            entity.BookId = dto.BookId;
+            entity.AuthorId = dto.AuthorId;
+            return entity;
+        }
     }
 }
-

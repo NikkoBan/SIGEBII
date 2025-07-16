@@ -9,18 +9,17 @@ using System.Threading.Tasks;
 
 namespace SIGEBI.Domain.Entities.Configuration
 {
-    public  class LoanDetails : Base.BaseEntity<int>
+    public  class LoanDetails : BaseEntity<int>
     {
         
-            [Column("LoandDetaild")]
-            [Key]
+            
             public override int Id { get; set; }
             
         public int LoandId { get; set; }
-        public Loans Loans { get; set; }
+        public Loans? Loans { get; set; }
 
         public int BookId { get; set; }
-        public Books Books { get; set; }
+        public Books? Books { get; set; }
 
 
 

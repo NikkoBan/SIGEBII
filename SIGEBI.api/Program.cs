@@ -1,65 +1,38 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
-using SIGEBI.Application.mappers;
-using SIGEBI.Application.Contracts.Repository;
-using SIGEBI.Application.Contracts.Service;
-using SIGEBI.Persistence.Repositories;
+
 using SIGEBI.Persistence.Context;
 
-using SIGEBI.Application.Services;
+using SIGEBI.IOC.Dependencias;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. OBTENER LA CADENA DE CONEXIÓN ---
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// --- 2. REGISTRAR AUTOMAPPER ---
-builder.Services.AddAutoMapper(typeof(AuthorProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(Program));
 
-// --- 3. REGISTRAR EL DBContext PARA EF CORE ---
 builder.Services.AddDbContext<SIGEBIContext>(options =>
-    options.UseSqlServer(connectionString)
-);
+    options.UseSqlServer(connectionString));
 
-// --- 4. REGISTRAR LOS REPOSITORIOS ---
-builder.Services.AddScoped<IAuthorRepository, AuthorRepository>(provider =>
-{
-    var logger = provider.GetRequiredService<ILogger<AuthorRepository>>();
-    return new AuthorRepository(connectionString, logger);
-});
+// Registro de dependencias por módulos, todo en una línea
+builder.Services.RegisterSIGEBIDependencies();
 
-builder.Services.AddScoped<IBookAuthorRepository, BookAuthorRepository>(provider =>
-{
-    var logger = provider.GetRequiredService<ILogger<BookAuthorRepository>>();
-    return new BookAuthorRepository(connectionString, logger);
-});
-
-builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
-
-// --- 5. REGISTRAR LOS SERVICIOS ---
-builder.Services.AddScoped<IAuthorService, AuthorService>();
-builder.Services.AddScoped<IBookAuthorService, BookAuthorService>();
-
-// --- 6. CONFIGURACIÓN ESTÁNDAR DE ASP.NET CORE ---
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo { Title = "SIGEBI API", Version = "v1" });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SIGEBI API V1"));
 }
 
 app.UseHttpsRedirection();
-app.UseAuthorization(); // Asegúrate de tener autenticación/autorización configurada si la usas.
-
+app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

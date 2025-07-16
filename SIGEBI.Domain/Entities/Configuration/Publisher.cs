@@ -7,16 +7,15 @@ namespace SIGEBI.Domain.Entities.Configuration
 {
     public class Publisher : BaseEntity<int>
     {
-        [Column("PublisherId")]
-        [Key]
+        
         public override int Id { get; set; }
 
-        public string PublisherName { get; set; }
-        public string Address { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
-        public string Website { get; set; }
+        public required string PublisherName { get; set; }
+        public required string Address { get; set; }
+        public required string PhoneNumber { get; set; }
+        public required string Email { get; set; }
+        public required string Website { get; set; }
 
-        public ICollection<Books> Books { get; set; }
+        public ICollection<Books> Books { get; set; } = new List<Books>();
     }
 }

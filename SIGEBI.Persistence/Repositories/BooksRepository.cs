@@ -1,76 +1,110 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Contracts.Repository;
+
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Base.SIGEBI.Persistence.Repositories;
+
 using SIGEBI.Persistence.Context;
+using SIGEBI.Persistence.Base;
+
+using SIGEBI.Domain.IRepository;
+using SIGEBI.Application.Dtos.BooksDtos;
+using SIGEBI.Application.mappers;
+
+
 
 namespace SIGEBI.Persistence.Repositories
 {
     public class BookRepository : BaseRepositoryEf<Books>, IBookRepository
     {
-        public BookRepository(SIGEBIContext context, ILogger<BaseRepositoryEf<Books>> logger)
-            : base(context, logger) { }
+        public BookRepository(SIGEBIContext context, ILogger<BookRepository> logger)
+            : base(context, logger)
+        {
+        }
 
         public async Task<bool> CheckDuplicateBookTitleAsync(string title, int? excludeBookId = null)
         {
-            if (excludeBookId.HasValue)
-            {
-                return await _dbSet.AnyAsync(b => b.Title == title && b.Id != excludeBookId.Value);
-            }
-            return await _dbSet.AnyAsync(b => b.Title == title);
+            return await _dbSet.AnyAsync(b =>
+                b.Title == title && (!excludeBookId.HasValue || b.Id != excludeBookId));
         }
 
-        public async Task<OperationResult> GetBooksByAuthorIdAsync(int authorId)
+        public async Task<OperationResult> GetBooksByCategoryAsync(int categoryId)
+        {
+            try
+            {
+                var books = await _dbSet.Where(b => b.CategoryId == categoryId).ToListAsync();
+                var BookDTO = books.Select(b => b.ToDTO()).ToList();
+                return new OperationResult { Success = true, Data = BookDTO };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error obteniendo libros por categoría {categoryId}.");
+                return new OperationResult { Success = false, Message = ex.Message };
+            }
+        }
+
+        public async Task<OperationResult> GetBooksByPublisherAsync(int publisherId)
+        {
+            try
+            {
+                var books = await _dbSet.Where(b => b.PublisherId == publisherId).ToListAsync();
+                var BookDTO = books.Select(b => b.ToDTO()).ToList();
+                return new OperationResult { Success = true, Data = BookDTO };
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error obteniendo libros por editorial {publisherId}.");
+                return new OperationResult { Success = false, Message = ex.Message };
+            }
+        }
+
+        public async Task<OperationResult> SearchBooksAsync(string searchTerm)
         {
             try
             {
                 var books = await _dbSet
-                                .Include(b => b.BooksAuthors) 
-                                .ThenInclude(ba => ba.Authors) 
-                                .Where(b => b.BooksAuthors.Any(ba => ba.AuthorId == authorId))
-                                .ToListAsync();
-
-                if (!books.Any())
-                {
-                    return new OperationResult { Success = false, Message = $"No se encontraron libros para el autor con ID {authorId}." };
-                }
-                return new OperationResult { Success = true, Data = books };
+                    .Where(b =>
+                        b.Title.Contains(searchTerm) ||
+                        b.ISBN.Contains(searchTerm) ||
+                        b.Summary.Contains(searchTerm))
+                    .ToListAsync();
+                var BookDTO = books.Select(b => b.ToDTO()).ToList();
+                return new OperationResult { Success = true, Data = BookDTO };
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al obtener libros por AuthorId {authorId}.");
-                return new OperationResult { Success = false, Message = $"Error al obtener libros por autor: {ex.Message}" };
+                _logger.LogError(ex, $"Error buscando libros con término '{searchTerm}'.");
+                return new OperationResult { Success = false, Message = ex.Message };
             }
         }
 
-
-
-      public override async Task<OperationResult> GetByIdAsync(int id)
+        public async Task<OperationResult> GetAvailableBooksAsync()
         {
             try
             {
-                var book = await _dbSet
-                                .Include(b => b.BooksAuthors)
-                                .ThenInclude(ba => ba.Authors)
-                                .FirstOrDefaultAsync(b => b.Id == id); 
-
-                if (book == null)
-                {
-                    return new OperationResult { Success = false, Message = $"Libro con ID {id} no encontrado." };
-                }
-                return new OperationResult { Success = true, Data = book };
+                var books = await _dbSet.Where(b => !b.IsDeleted).ToListAsync();
+                var BookDTO = books.Select(b => b.ToDTO()).ToList();
+                return new OperationResult { Success = true, Data = BookDTO };
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error al obtener libro con ID {id} con detalles.");
-                return new OperationResult { Success = false, Message = $"Error al obtener libro: {ex.Message}" };
+                _logger.LogError(ex, "Error obteniendo libros disponibles.");
+                return new OperationResult
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
             }
-      }
+        }
+
+        public async Task<bool> CheckDuplicateISBNAsync(string isbn, int? excludeBookId = null)
+        {
+            return await _dbSet.AnyAsync(b =>
+                b.ISBN == isbn && (!excludeBookId.HasValue || b.Id != excludeBookId));
+        }
     }
+
 }
-
-
 
 

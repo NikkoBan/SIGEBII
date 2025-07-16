@@ -1,78 +1,134 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Contracts.Repository;
 using SIGEBI.Domain.Base;
+using SIGEBI.Domain.IRepository;
 using SIGEBI.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+
+
+
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SIGEBI.Persistence.Base
 {
-    namespace SIGEBI.Persistence.Repositories
+    public abstract class BaseRepositoryEf<TEntity> : IBaseRepository<TEntity>
+     where TEntity : AuditableEntity
     {
-        public abstract class BaseRepositoryEf<TEntity> : IBaseRepository<TEntity>
-            where TEntity : class
+        protected readonly SIGEBIContext _context;
+        protected readonly DbSet<TEntity> _dbSet;
+        protected readonly ILogger<BaseRepositoryEf<TEntity>> _logger;
+
+        protected BaseRepositoryEf(SIGEBIContext context, ILogger<BaseRepositoryEf<TEntity>> logger)
         {
-            protected readonly SIGEBIContext _context;
-            protected readonly DbSet<TEntity> _dbSet;
-            protected readonly ILogger<BaseRepositoryEf<TEntity>> _logger;
-            public BaseRepositoryEf(SIGEBIContext context, ILogger<BaseRepositoryEf<TEntity>> logger)
-            {
-                _context = context;
-                _dbSet = context.Set<TEntity>();
-                _logger = logger;
-            }
+            _context = context;
+            _dbSet = context.Set<TEntity>();
+            _logger = logger;
+        }
 
-            public virtual Task<OperationResult> CreateAsync(TEntity entity)
+        public virtual async Task<OperationResult> CreateAsync(TEntity entity)
+        {
+            try
             {
-                throw new NotImplementedException();
-            }
+                await _dbSet.AddAsync(entity);
+                await _context.SaveChangesAsync();
 
-            public Task<OperationResult> CreateAsync(AuditableEntity entity)
-            {
-                throw new NotImplementedException();
+                return OperationResult.SuccessResult(entity, $"{typeof(TEntity).Name} creado exitosamente.");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al crear {Entity}", typeof(TEntity).Name);
+                return OperationResult.FailureResult($"Error al crear {typeof(TEntity).Name}: {ex.Message}");
+            }
+        }
 
-            public virtual Task<OperationResult> DeleteAsync(int id)
+        public virtual async Task<OperationResult> GetByIdAsync(int id)
+        {
+            try
             {
-                throw new NotImplementedException();
+                var entity = await _dbSet.FindAsync(id);
+                return entity != null
+                    ? OperationResult.SuccessResult(entity)
+                    : OperationResult.FailureResult($"{typeof(TEntity).Name} no encontrado.");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al buscar {Entity} por ID", typeof(TEntity).Name);
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
 
-            public virtual Task<bool> ExistsAsync(int id)
+        public virtual async Task<OperationResult> GetAllAsync()
+        {
+            try
             {
-                throw new NotImplementedException();
+                var list = await _dbSet.ToListAsync();
+                return OperationResult.SuccessResult(list);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todos los registros de {Entity}", typeof(TEntity).Name);
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
 
-            public virtual Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            try
             {
-                throw new NotImplementedException();
+                var list = await _dbSet.Where(filter).ToListAsync();
+                return OperationResult.SuccessResult(list);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al filtrar registros de {Entity}", typeof(TEntity).Name);
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
 
-            public virtual Task<OperationResult> GetAllAsync(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<OperationResult> UpdateAsync(TEntity entity)
+        {
+            try
             {
-                throw new NotImplementedException();
+                _dbSet.Update(entity);
+                await _context.SaveChangesAsync();
+                return OperationResult.SuccessResult(entity, $"{typeof(TEntity).Name} actualizado correctamente.");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar {Entity}", typeof(TEntity).Name);
+                return OperationResult.FailureResult($"Error al actualizar {typeof(TEntity).Name}: {ex.Message}");
+            }
+        }
 
-            public Task<OperationResult> GetAllAsync()
+        public virtual async Task<OperationResult> DeleteAsync(int id)
+        {
+            try
             {
-                throw new NotImplementedException();
-            }
+                var entity = await _dbSet.FindAsync(id);
+                if (entity == null)
+                    return OperationResult.FailureResult($"{typeof(TEntity).Name} no encontrado.");
 
-            public virtual Task<OperationResult> GetByIdAsync(int id)
-            {
-                throw new NotImplementedException();
-            }
+                _dbSet.Remove(entity);
+                await _context.SaveChangesAsync();
 
-            public virtual Task<OperationResult> UpdateAsync(TEntity entity)
-            {
-                throw new NotImplementedException();
+                return OperationResult.SuccessResult(null, $"{typeof(TEntity).Name} eliminado exitosamente.");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al eliminar {Entity}", typeof(TEntity).Name);
+                return OperationResult.FailureResult(ex.Message);
+            }
+        }
+
+        public virtual async Task<bool> ExistsAsync(int id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            return entity != null;
+        }
+
+        public virtual async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            return await _dbSet.AnyAsync(filter);
         }
     }
 }
-
 

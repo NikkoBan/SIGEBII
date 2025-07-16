@@ -13,16 +13,16 @@ namespace SIGEBI.Domain.Entities.Configuration
 
         public int UserId { get; set; }
         public int? LoanId { get; set; } 
-        public string SanctionType { get; set; }
+        public required string SanctionType { get; set; }
         public decimal? FineAmount { get; set; }
         public DateTime ImpositionDate { get; set; } = DateTime.Now;
         public DateTime? DueDate { get; set; }
         public DateTime? PaymentDate { get; set; }
-        public string Reason { get; set; }
-        public string SanctionStatus { get; set; }
+        public required string Reason { get; set; }
+        public required string SanctionStatus { get; set; }
 
        
-        public User Users { get; set; }
-        public Loans Loans { get; set; }
+        public User? Users { get; set; }
+        public Loans ? Loans { get; set; }
     }
 }

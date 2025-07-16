@@ -7,14 +7,13 @@ namespace SIGEBI.Domain.Entities.Configuration
 {
     public class Role : BaseEntity<int>
     {
-        [Column("RoleId")]
-        [Key]
+       
         public override int Id { get; set; }
 
-        public string RoleName { get; set; }
-        public string Description { get; set; }
+        public required string RoleName { get; set; }
+        public required string Description { get; set; }
 
-       
-        public ICollection<User> Users { get; set; }
+
+        public ICollection<User> Users { get; set; } = new List<User>();
     }
 }

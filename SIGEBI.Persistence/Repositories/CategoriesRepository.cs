@@ -1,37 +1,50 @@
 ﻿
+namespace SIGEBI.Persistence.Repositories;
 
-using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Contracts.Repository;
-using SIGEBI.Application.Contracts.Service;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Base.SIGEBI.Persistence.Repositories;
-using SIGEBI.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
-namespace SIGEBI.Persistence.Repositories
-{
-    public class CategoryRepository : BaseRepositoryEf<Categories>, ICategoryRepository
-    {
-        public CategoryRepository(SIGEBIContext context, ILogger<CategoryRepository> logger)
-             : base(context, logger) { }
+//    public class CategoryRepository : BaseRepositoryEf<Categories>, ICategoryRepository
+//    {
+//        public CategoryRepository(SIGEBIContext context, ILogger<BaseRepositoryEf<Categories>> logger)
+//            : base(context, logger) { }
 
-        public async Task<bool> CheckDuplicateCategoryNameAsync(string categoryName, int? excludeCategoryId = null)
-        {
-            try
-            {
-                if (excludeCategoryId.HasValue)
-                {
-                    
-                    return await _dbSet.AnyAsync(c => c.CategoryName == categoryName && c.Id != excludeCategoryId.Value);
-                }
-               
-                return await _dbSet.AnyAsync(c => c.CategoryName == categoryName);
-            }
-            catch (System.Exception ex)
-            {
-                _logger.LogError(ex, $"Error al verificar el nombre de categoría duplicado: {categoryName}.");
-                return false;
-            }
+//        public async Task<bool> CheckDuplicateCategoryNameAsync(string categoryName, int? excludeCategoryId = null)
+//        {
+//            try
+//            {
+//                return excludeCategoryId.HasValue
+//                    ? await _dbSet.AnyAsync(c => c.CategoryName == categoryName && c.Id != excludeCategoryId.Value)
+//                    : await _dbSet.AnyAsync(c => c.CategoryName == categoryName);
+//            }
+//            catch (Exception ex)
+//            {
+//                _logger.LogError(ex, "Error verificando nombre duplicado de categoría");
+//                return false;
+//            }
+//        }
+//        public override async Task<OperationResult> CreateAsync(Categories entity)
+//        {
+//            try
+//            {
+//                await _dbSet.AddAsync(entity);
+//                await _context.SaveChangesAsync();
 
-        }
-    }
-}
+//                return new OperationResult
+//                {
+//                    Success = true,
+//                    Data = entity,
+//                    Message = "Categoría creada exitosamente."
+//                };
+//            }
+
+//            catch (Exception ex)
+//            {
+//                _logger.LogError(ex, "Error al crear la categoría.");
+//                return new OperationResult
+//                {
+//                    Success = false,
+//                    Message = $"Error al crear Categories: {ex.Message}"
+//                };
+//            }
+
+//        }
+//    }
+//}

@@ -6,13 +6,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SIGEBI.Domain.Entities.Configuration
 {
-    public class Categories : Base.BaseEntity<int>
+    public class Categories : BaseEntity<int>
     {
-        [Column("CategoryId")]
-        [Key]
 
-        public override int Id { get; set; }
-        public string CategoryName { get; set; }
+       
+        public override  int Id { get; set; }
+        public string CategoryName { get; set; }= string.Empty;
         public string? Description { get; set; }
 
 

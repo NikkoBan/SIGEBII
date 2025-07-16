@@ -11,10 +11,10 @@ namespace SIGEBI.Domain.Entities.Configuration
         public override int Id { get; set; }
 
         public int? OriginalReservationId { get; set; } 
-        public string FinalStatus { get; set; } 
+        public required string FinalStatus { get; set; } 
         public DateTime UpdateDate { get; set; } = DateTime.Now;
 
-        public Books Book { get; set; }
-        public User User { get; set; }
+        public Books? Book { get; set; }
+        public User ? User { get; set; }
     }
 }

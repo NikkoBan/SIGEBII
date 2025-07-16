@@ -1,139 +1,144 @@
-﻿using SIGEBI.Application.Contracts.Repository;
-using SIGEBI.Application.Contracts.Service;
+﻿
 using SIGEBI.Domain.Base;
 using AutoMapper;
+using Microsoft.Extensions.Logging;
+using SIGEBI.Application.Contracts.Service;
+using SIGEBI.Domain.IRepository;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace SIGEBI.Application.Services
 {
-    public abstract class BaseService<TEntity, TCreateDto, TUpdateDto, TReadDto> : IBaseService<TCreateDto, TUpdateDto, TReadDto>
+
+    public abstract class BaseService<TDto, TCreateDto, TUpdateDto, TEntity>
+        : IBaseService<TDto, TCreateDto, TUpdateDto>
         where TEntity : AuditableEntity
+        where TDto : class
         where TCreateDto : class
         where TUpdateDto : class
-        where TReadDto : class
     {
-
-
-
         protected readonly IBaseRepository<TEntity> _repository;
-        protected readonly IMapper _mapper;
+        protected readonly ILogger _logger;
 
-       
-        public BaseService(IBaseRepository<TEntity> repository, IMapper mapper)
+        protected BaseService(IBaseRepository<TEntity> repository, ILogger logger)
         {
             _repository = repository;
-            _mapper = mapper;
+            _logger = logger;
         }
-      
 
+        public async Task<OperationResult> GetAllAsync()
+        {
+            try
+            {
+                var result = await _repository.GetAllAsync();
+                if (!result.Success) return result;
+
+                var dtos = MapToDtoList((IEnumerable<TEntity>)result.Data!);
+                return OperationResult.SuccessResult(dtos);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener todos los registros de {typeof(TEntity).Name}");
+                return OperationResult.FailureResult($"Error interno: {ex.Message}");
+            }
+        }
+
+        public async Task<OperationResult> GetByIdAsync(int id)
+        {
+            try
+            {
+                var result = await _repository.GetByIdAsync(id);
+                if (!result.Success || result.Data == null)
+                    return OperationResult.FailureResult($"{typeof(TEntity).Name} no encontrado.");
+
+                var dto = MapToDto((TEntity)result.Data);
+                return OperationResult.SuccessResult(dto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al obtener {typeof(TEntity).Name} con ID {id}");
+                return OperationResult.FailureResult($"Error interno: {ex.Message}");
+            }
+        }
 
         public virtual async Task<OperationResult> CreateAsync(TCreateDto dto)
         {
             try
             {
-                var entity = _mapper.Map<TEntity>(dto);
+                var entity = MapToEntity(dto);
+
+                // Auditoría centralizada aquí
                 entity.CreatedAt = DateTime.UtcNow;
                 entity.CreatedBy = "System";
+                entity.UpdatedAt = DateTime.UtcNow;
+                entity.UpdatedBy = "System";
+                entity.IsDeleted = false;
 
                 var result = await _repository.CreateAsync(entity);
-                if (result.Success)
-                {
-                    var readDto = _mapper.Map<TReadDto>(entity);
-                    return new OperationResult { Success = true, Data = readDto };
-                }
-
-                return new OperationResult { Success = false, Message = result.Message };
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult { Success = false, Message = $"Error: {ex.Message}" };
-            }
-        }
-
-
-        public virtual async Task<OperationResult> DeleteAsync(int id)
-        {
-            try
-            {
-                var result = await _repository.DeleteAsync(id);
                 return result;
             }
+            catch (DbUpdateException dbEx)
+            {
+                _logger.LogError(dbEx, $"Error al crear {typeof(TEntity).Name}: {dbEx.InnerException?.Message ?? dbEx.Message}");
+                return OperationResult.FailureResult($"Error al crear {typeof(TEntity).Name}: {dbEx.InnerException?.Message ?? dbEx.Message}");
+            }
             catch (Exception ex)
             {
-                return new OperationResult { Success = false, Message = $"Error: {ex.Message}" };
+                _logger.LogError(ex, $"Error al crear {typeof(TEntity).Name}");
+                return OperationResult.FailureResult($"Error interno: {ex.Message}");
             }
+
         }
-        
-
-
-
-        public virtual async Task<OperationResult> GetAllAsync()
+        public async Task<OperationResult> UpdateAsync(int id, TUpdateDto dto)
         {
             try
             {
-                var result = await _repository.GetAllAsync();
-                if (result.Success && result.Data is IEnumerable<TEntity> list)
-                {
-                    var dtoList = _mapper.Map<IEnumerable<TReadDto>>(list);
-                    return new OperationResult { Success = true, Data = dtoList };
-                }
+                var existingResult = await _repository.GetByIdAsync(id);
+                if (!existingResult.Success || existingResult.Data is not TEntity entity)
+                    return OperationResult.FailureResult($"{typeof(TEntity).Name} no encontrado.");
 
-                return new OperationResult { Success = false, Message = result.Message ?? "No se pudo obtener la lista." };
+                var updatedEntity = MapToEntity(dto, entity);
+
+                // Aquí seteas la auditoría de actualización
+                updatedEntity.UpdatedAt = DateTime.UtcNow;
+                updatedEntity.UpdatedBy = ObtenerUsuarioActual();
+
+                return await _repository.UpdateAsync(updatedEntity);
             }
             catch (Exception ex)
             {
-                return new OperationResult { Success = false, Message = $"Error: {ex.Message}" };
+                _logger.LogError(ex, $"Error al actualizar {typeof(TEntity).Name} con ID {id}");
+                return OperationResult.FailureResult($"Error interno: {ex.Message}");
             }
         }
 
-        public virtual async Task<OperationResult> GetByIdAsync(int id)
+        public async Task<OperationResult> DeleteAsync(int id)
         {
             try
             {
-                var result = await _repository.GetByIdAsync(id);
-                if (result.Success && result.Data is TEntity entity)
-                {
-                    var dto = _mapper.Map<TReadDto>(entity);
-                    return new OperationResult { Success = true, Data = dto };
-                }
-
-                return new OperationResult { Success = false, Message = $"Entidad con ID {id} no encontrada." };
+                return await _repository.DeleteAsync(id);
             }
             catch (Exception ex)
             {
-                return new OperationResult { Success = false, Message = $"Error: {ex.Message}" };
+                _logger.LogError(ex, $"Error al eliminar {typeof(TEntity).Name} con ID {id}");
+                return OperationResult.FailureResult($"Error interno: {ex.Message}");
             }
         }
-
-        public virtual async Task<OperationResult> UpdateAsync(int id, TUpdateDto dto)
+        protected virtual string ObtenerUsuarioActual()
         {
-            try
-            {
-                var result = await _repository.GetByIdAsync(id);
-                if (!result.Success || result.Data is not TEntity entity)
-                {
-                    return new OperationResult { Success = false, Message = $"No se encontró la entidad con ID {id} para actualizar." };
-                }
-
-                _mapper.Map(dto, entity);
-                entity.UpdateAt = DateTime.UtcNow;
-                entity.UpdateBy = "System";
-
-                var updateResult = await _repository.UpdateAsync(entity);
-                if (updateResult.Success)
-                {
-                    var updatedDto = _mapper.Map<TReadDto>(entity);
-                    return new OperationResult { Success = true, Data = updatedDto };
-                }
-
-                return new OperationResult { Success = false, Message = updateResult.Message ?? "Fallo al actualizar la entidad." };
-            }
-            catch (Exception ex)
-            {
-                return new OperationResult { Success = false, Message = $"Error: {ex.Message}" };
-            }
-
+            return "System";
         }
+
+
+        // =======================
+        // Métodos de mapeo abstractos
+        // =======================
+
+        protected abstract TDto MapToDto(TEntity entity);
+        protected abstract IEnumerable<TDto> MapToDtoList(IEnumerable<TEntity> entities);
+        protected abstract TEntity MapToEntity(TCreateDto dto);
+        protected abstract TEntity MapToEntity(TUpdateDto dto, TEntity entity);
     }
 }
-            
+
 

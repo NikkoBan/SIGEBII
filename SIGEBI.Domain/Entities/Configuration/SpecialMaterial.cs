@@ -11,17 +11,17 @@ namespace SIGEBI.Domain.Entities.Configuration
         [Key]
         public override int Id { get; set; }
 
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public string Description { get; set; }
+        public required string Title { get; set; }
+        public required string   Author { get; set; }
+        public required string Description { get; set; }
         public DateTime RequestDate { get; set; } = DateTime.Now;
         public int RequestedByUserId { get; set; }
-        public string ApprovalStatus { get; set; } 
+        public required string ApprovalStatus { get; set; } 
         public int? ApprovedByUserId { get; set; }
         public DateTime? AcquisitionDate { get; set; }
 
         
-        public User RequestedByUser { get; set; }
-        public User ApprovedByUser { get; set; }
+        public User? RequestedByUser { get; set; }
+        public User? ApprovedByUser { get; set; }
     }
 }
