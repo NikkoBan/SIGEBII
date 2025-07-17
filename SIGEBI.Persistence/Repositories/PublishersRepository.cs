@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -28,7 +29,10 @@ namespace SIGEBI.Persistence.Repositories
                 if (!validation.Success)
                     return validation;
 
-                await _dbContext.Publishers.AddAsync(entity);
+                if (await ExistsByNameOrEmailAsync(entity.PublisherName, entity.Email))
+                return OperationResult.Fail("Ya existe una editorial con ese nombre o correo electrónico.");
+
+                        await _dbContext.Publishers.AddAsync(entity);
                 await _dbContext.SaveChangesAsync();
                 return OperationResult.Ok("Editorial guardada correctamente.", entity);
             }
@@ -53,15 +57,15 @@ namespace SIGEBI.Persistence.Repositories
             {
                 return await _dbContext.Publishers
                     .Include(p => p.Books)
-                    .FirstOrDefaultAsync(p => p.ID == id);
+                    .FirstOrDefaultAsync(p => p.ID == id && !p.IsDeleted);
             }
 
             public override async Task<List<Publishers>> GetAllAsync()
             {
-                return await _dbContext.Publishers
-                    .Include(p => p.Books)
-                    .ToListAsync();
-            }
+                    return await _dbContext.Publishers
+                   .Where(p => !p.IsDeleted)
+                   .ToListAsync();
+        }
 
             public override async Task<bool> Exists(System.Linq.Expressions.Expression<Func<Publishers, bool>> filter)
             {
@@ -70,18 +74,31 @@ namespace SIGEBI.Persistence.Repositories
 
             public override async Task<OperationResult> RemoveEntityAsync(Publishers entity)
             {
-                var existing = await _dbContext.Publishers.FindAsync(entity.ID);
-                if (existing == null)
-                    return OperationResult.Fail("Editorial no encontrada.");
+            var existing = await _dbContext.Publishers
+                    .Include(p => p.Books)
+                    .FirstOrDefaultAsync(p => p.ID == entity.ID);
 
-                _dbContext.Publishers.Remove(existing);
-                await _dbContext.SaveChangesAsync();
-                return OperationResult.Ok("Editorial eliminada correctamente.");
-            }
+            if (existing == null)
+                return OperationResult.Fail("Editorial no encontrada.");
 
-            public async Task<List<Publishers>> SearchByNameAsync(string name)
+            if (existing.IsDeleted)
+                return OperationResult.Fail("La editorial ya está eliminada.");
+
+            if (existing.Books != null && existing.Books.Any())
+                return OperationResult.Fail("No se puede eliminar una editorial con libros asociados.");
+
+            _dbContext.Publishers.Remove(existing);
+            await _dbContext.SaveChangesAsync();
+            return OperationResult.Ok("Editorial eliminada correctamente.");
+
+        }
+
+        public async Task<List<Publishers>> SearchByNameAsync(string name)
             {
-                return await _dbContext.Publishers
+            if (string.IsNullOrWhiteSpace(name))
+                return new List<Publishers>();
+
+            return await _dbContext.Publishers
                     .Where(p => p.PublisherName.Contains(name))
                     .ToListAsync();
             }
@@ -94,19 +111,31 @@ namespace SIGEBI.Persistence.Repositories
 
             private OperationResult ValidatePublisher(Publishers entity)
             {
-                if (string.IsNullOrWhiteSpace(entity.PublisherName))
-                    return OperationResult.Fail("El nombre de la editorial es obligatorio.");
+            if (string.IsNullOrWhiteSpace(entity.PublisherName))
+                return OperationResult.Fail("El nombre de la editorial es obligatorio.");
 
-                if (!string.IsNullOrWhiteSpace(entity.Email) &&
-                    !Regex.IsMatch(entity.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
-                    return OperationResult.Fail("El correo electrónico no es válido.");
+            if (!string.IsNullOrWhiteSpace(entity.Email) &&
+                !Regex.IsMatch(entity.Email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+                return OperationResult.Fail("El correo electrónico no es válido.");
 
-                if (!string.IsNullOrWhiteSpace(entity.PhoneNumber) &&
-                    !Regex.IsMatch(entity.PhoneNumber, @"^\+?\d{7,15}$"))
-                    return OperationResult.Fail("El número de teléfono no es válido.");
+            if (!string.IsNullOrWhiteSpace(entity.PhoneNumber) &&
+                !Regex.IsMatch(entity.PhoneNumber, @"^\+?\d{7,15}$"))
+                return OperationResult.Fail("El número de teléfono no es válido.");
 
-                return OperationResult.Ok();
-            }
+            if (!string.IsNullOrWhiteSpace(entity.Address) && entity.Address.Length > 200)
+                return OperationResult.Fail("La dirección no puede superar los 200 caracteres.");
+
+            if (string.IsNullOrWhiteSpace(entity.CreatedBy))
+                return OperationResult.Fail("El campo 'Creado por' es obligatorio.");
+
+            if (entity.IsDeleted)
+                return OperationResult.Fail("No se puede modificar una editorial eliminada.");
+
+            if (entity.PublisherName.Length > 100)
+                return OperationResult.Fail("El nombre de la editorial no puede superar los 100 caracteres.");
+
+            return OperationResult.Ok();
+        }
 
             private void MapPublisher(Publishers target, Publishers source)
             {
@@ -122,7 +151,7 @@ namespace SIGEBI.Persistence.Repositories
         public async Task<bool> ExistsByNameOrEmailAsync(string name, string email)
         {
             return await _dbContext.Publishers
-                .AnyAsync(p => p.PublisherName == name || p.Email == email);
+                .AnyAsync(p => p.PublisherName == name || p.Email == email && !p.IsDeleted);
         }
 
         public async Task<bool> ExistsByNameOrEmailExceptIdAsync(string name, string email, int excludeId)

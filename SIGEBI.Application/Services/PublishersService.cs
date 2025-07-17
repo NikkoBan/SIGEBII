@@ -38,7 +38,10 @@ namespace SIGEBI.Application.Services
 
         public async Task<OperationResult> CreateAsync(CreationPublisherDto publisherDto)
         {
-            
+            if (publisherDto == null)
+                throw new ArgumentNullException(nameof(publisherDto));
+
+
             if (await _repository.ExistsByNameOrEmailAsync(publisherDto.PublisherName, publisherDto.Email))
                 return OperationResult.Fail("Ya existe una editorial con ese nombre o correo.");
 
@@ -51,6 +54,9 @@ namespace SIGEBI.Application.Services
 
         public async Task<OperationResult> UpdateAsync(UpdatePublisherDto publisherDto)
         {
+            if (publisherDto == null)
+                throw new ArgumentNullException(nameof(publisherDto));
+
             var publisher = await _repository.GetEntityByIdAsync(publisherDto.Id);
             if (publisher == null)
                 return OperationResult.Fail("Editorial no encontrada.");
@@ -68,6 +74,9 @@ namespace SIGEBI.Application.Services
 
         public async Task<OperationResult> DeleteAsync(RemovePublisherDto publisherDto)
         {
+            if (publisherDto == null)
+                throw new ArgumentNullException(nameof(publisherDto));
+
             var publisher = await _repository.GetEntityByIdAsync(publisherDto.Id);
             if (publisher == null)
                 return OperationResult.Fail("Editorial no encontrada.");
@@ -84,6 +93,7 @@ namespace SIGEBI.Application.Services
 
         public async Task<PublisherDto?> GetByEmailAsync(string email)
         {
+
             var publisher = await _repository.GetByEmailAsync(email);
             return publisher?.ToDto();
         }
