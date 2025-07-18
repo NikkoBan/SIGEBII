@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using SIGEBI.Persistence.Context;
 
 using SIGEBI.IOC.Dependencias;
+using SIGEBI.Application.Contracts.Service;
+using SIGEBI.Application.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,8 @@ builder.Services.AddDbContext<SIGEBIContext>(options =>
 
 // Registro de dependencias por módulos, todo en una línea
 builder.Services.RegisterSIGEBIDependencies();
+
+builder.Services.AddScoped<IAuthorService, AuthorService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

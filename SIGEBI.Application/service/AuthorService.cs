@@ -20,8 +20,9 @@ namespace SIGEBI.Application.Services
             _authorRepository = authorRepository;
         }
 
-        public async Task<OperationResult> GetGenresByAuthorAsync(int authorId)
-        {
+        
+           public async Task<OperationResult> GetGenresByAuthorAsync(int authorId)
+             {
             try
             {
                 if (!await _authorRepository.ExistsAsync(authorId))
@@ -30,12 +31,14 @@ namespace SIGEBI.Application.Services
                 var genres = await _authorRepository.GetGenresByAuthorAsync(authorId);
                 return OperationResult.SuccessResult(genres);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Error obteniendo géneros del autor con ID {AuthorId}", authorId);
                 return OperationResult.FailureResult($"Error interno: {ex.Message}");
             }
-        }
+           }
+
+        
 
         public async Task<OperationResult> ExistsAsync(int authorId)
         {
