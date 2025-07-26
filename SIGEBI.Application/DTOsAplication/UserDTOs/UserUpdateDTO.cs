@@ -29,5 +29,6 @@ namespace SIGEBI.Application.DTOsAplication.UserDTOs
 
         [StringLength(100, ErrorMessage = "El nombre del actualizador no puede exceder los 100 caracteres.")]
         public string? UpdatedBy { get; set; }
+        public int UserId { get; set; }
     }
 }

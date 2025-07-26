@@ -1,0 +1,78 @@
+﻿@model SIGEBI.Web.Models.Users.LoginRequest
+@{
+    ViewData["Title"] = "Iniciar Sesión";
+    Layout = null; // Se mantiene null para que use su propio diseño único
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SIGEBI.Web</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="login-body">
+
+    <div class="login-container">
+        <div class="login-header">
+            @* Fondo de montañas y elefante (simulación o imagen real) *@
+            <div class="mountain-bg"></div>
+            @* Si tienes la imagen del elefante, descomenta la siguiente línea y asegúrate que la ruta sea correcta: *@
+            @* <img src="~/images/elephant.png" alt="Elephant" class="elephant-img"> *@
+            <h2>Welcome to the Website</h2>
+        </div>
+
+        <div class="login-body-form">
+            <h3>USER LOGIN</h3>
+
+            @* Mensajes de éxito o error *@
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert alert-danger" role="alert">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(TempData["SuccessMessage"] as string))
+            {
+                <div class="alert alert-success" role="alert">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+            <div asp-validation-summary="ModelOnly" class="validation-summary-errors"></div>
+
+            <form asp-action="Login">
+                <div class="login-input-group">
+                    <i class="fas fa-user"></i> @* Icono de usuario (requiere Font Awesome) *@
+                    <input asp-for="InstitutionalEmail" class="form-control" placeholder="Username" />
+                    <span asp-validation-for="InstitutionalEmail" class="text-danger"></span>
+                </div>
+                <div class="login-input-group">
+                    <i class="fas fa-lock"></i> @* Icono de candado (requiere Font Awesome) *@
+                    <input asp-for="Password" class="form-control" type="password" placeholder="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <a href="#" class="forgot-password">Forgot Password?</a> @* Puedes enlazar esto a una página real *@
+
+                <button type="submit" class="btn btn-login">LOGIN</button>
+            </form>
+        </div>
+
+        <div class="login-footer">
+            Designed by <a href="https://www.freepik.com" target="_blank" style="color:#888;">freepik</a>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

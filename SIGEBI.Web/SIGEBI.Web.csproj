@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <ProjectReference Include="..\SIGEBI.Application\SIGEBI.Application.csproj" />
+    <ProjectReference Include="..\SIGEBI.Domain\SIGEBI.Domain.csproj" />
+    <ProjectReference Include="..\SIGEBI.Persistence\SIGEBI.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

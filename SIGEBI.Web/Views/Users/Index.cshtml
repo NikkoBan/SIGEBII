@@ -1,0 +1,60 @@
+﻿@model IEnumerable<SIGEBI.Web.Models.Users.UserViewModel>
+@{
+    ViewData["Title"] = "Listado de Usuarios";
+}
+
+<h1>Listado de Usuarios del Sistema</h1>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+@if (!string.IsNullOrEmpty(ViewBag.WarningMessage))
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.WarningMessage
+    </div>
+}
+else if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info" role="alert">
+        No se encontraron usuarios para mostrar.
+    </div>
+}
+else
+{
+    <p>
+        <a asp-action="Register" class="btn btn-primary">Registrar Nuevo Usuario</a>
+    </p>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.UserId)</th>
+                <th>@Html.DisplayNameFor(model => model.FullName)</th>
+                <th>@Html.DisplayNameFor(model => model.InstitutionalEmail)</th>
+                <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+                <th>@Html.DisplayNameFor(model => model.RegistrationDate)</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.UserId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.InstitutionalEmail)</td>
+                    <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
+                    <td>@Html.DisplayFor(modelItem => item.RegistrationDate)</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-sm btn-info">Editar</a> |
+                        <a asp-action="Details" asp-route-id="@item.UserId" class="btn btn-sm btn-secondary">Detalles</a> |
+                        <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

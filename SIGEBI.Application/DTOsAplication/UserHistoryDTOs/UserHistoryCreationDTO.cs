@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿// SIGEBI.Application/DTOsAplication/UserHistoryDTOs/UserHistoryCreationDto.cs
+
+using System.ComponentModel.DataAnnotations;
 using System;
 
 namespace SIGEBI.Application.DTOsAplication.UserHistoryDTOs
@@ -12,6 +14,10 @@ namespace SIGEBI.Application.DTOsAplication.UserHistoryDTOs
         [Required(ErrorMessage = "El correo ingresado es requerido.")]
         [EmailAddress(ErrorMessage = "Formato de correo electrónico inválido.")]
         public string EnteredEmail { get; set; } = null!;
+
+        [Required(ErrorMessage = "La fecha de intento es requerida.")] // <-- ¡ESTA ES LA LÍNEA CLAVE!
+        [Display(Name = "Fecha de Intento")]
+        public DateTime AttemptDate { get; set; } // <-- ¡PROPIEDAD AGREGADA/CONFIRMADA!
 
         public string? IpAddress { get; set; }
         public string? UserAgent { get; set; }

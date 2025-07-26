@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+ï»¿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.DTOsAplication.UserDTOs;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Persistence.Base;
@@ -71,7 +71,7 @@ namespace SIGEBI.API.Controllers
         {
             if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
             {
-                return BadRequest(OperationResult<bool>.Fail("Email y contraseña son requeridos."));
+                return BadRequest(OperationResult<bool>.Fail("Email y contraseï¿½a son requeridos."));
             }
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
@@ -81,7 +81,7 @@ namespace SIGEBI.API.Controllers
 
             if (result.Success)
             {
-                /* Cuando el login es exitoso, dirige al usuario al menú principal de la biblioteca. */
+                /* Cuando el login es exitoso, dirige al usuario al menï¿½ principal de la biblioteca. */
                 return Ok(result);
             }
             return Unauthorized(result);

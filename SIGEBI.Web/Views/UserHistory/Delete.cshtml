@@ -1,0 +1,70 @@
+﻿@model SIGEBI.Web.Models.UserHistory.UserHistoryViewModel
+@{
+    ViewData["Title"] = "Confirmar Eliminación de Historial";
+}
+
+<h1>Confirmar Eliminación de Entrada de Historial</h1>
+
+<h3>¿Estás seguro de que quieres eliminar esta entrada de historial?</h3>
+
+@if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewBag.ErrorMessage
+    </div>
+}
+@if (!string.IsNullOrEmpty(ViewBag.WarningMessage))
+{
+    <div class="alert alert-warning" role="alert">
+        @ViewBag.WarningMessage
+    </div>
+}
+else if (Model == null)
+{
+    <div class="alert alert-info" role="alert">
+        Entrada de historial no encontrada.
+    </div>
+}
+else
+{
+    <div>
+        <h4>Entrada de Historial</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.LogId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.LogId)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UserId)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.UserId)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.EnteredEmail)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.EnteredEmail)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.AttemptDate)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.AttemptDate)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IpAddress)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.IpAddress)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UserAgent)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.UserAgent)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.IsSuccessful)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.IsSuccessful)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FailureReason)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.FailureReason)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(model => model.ObtainedRole)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.ObtainedRole)</dd>
+        </dl>
+    </div>
+    <div class="mt-3">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="LogId" /> @* Campo oculto para el ID *@
+            <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+            <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+
+}

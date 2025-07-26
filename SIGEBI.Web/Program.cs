@@ -1,25 +1,39 @@
+// SIGEBI.Web/Program.cs
+
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration; // Necesario para IConfiguration
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.AddControllersWithViews(); // Habilita el patrón MVC
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// --- Configuración CRÍTICA para consumo de API (basado en el video) ---
+builder.Services.AddHttpClient(); // Registra HttpClientFactory para inyectar HttpClient
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage(); // Para ver errores detallados en desarrollo
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error"); // Página de error personalizada para producción
+    app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); // Redirige las solicitudes HTTP a HTTPS
+app.UseStaticFiles();      // Permite servir archivos estáticos (CSS, JS, imágenes) desde wwwroot
 
-app.UseAuthorization();
+app.UseRouting();
 
-app.MapControllers();
+app.UseAuthentication(); // Si usas autenticación (ej. cookies de ASP.NET Core Identity)
+app.UseAuthorization();  // Habilita el middleware de autorización
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"); // Establece Home/Index como la ruta por defecto
 
 app.Run();
