@@ -11,12 +11,12 @@ namespace SIGEBI.Domain.Entities
     {
         public override int ID { get; set; }
         public int UserId { get; set; }
-        public string EnteredEmail { get; set; }
+        public string? EnteredEmail { get; set; }
         public DateTime AttempDate { get; set; }
-        public string IpAddress { get; set; }
+        public string? IpAddress { get; set; }
         public string? UserAgent { get; set; }
         public bool IsSuccessful { get; set; }
         public string? FailureReason { get; set; }
-        public string ObteinedRole { get; set; }
+        public string? ObteinedRole { get; set; }
     }
 }

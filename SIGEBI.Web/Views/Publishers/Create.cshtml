@@ -1,0 +1,53 @@
+﻿@model SIGEBI.Web.Models.Publishers.PublisherCreateModel
+
+@{
+    ViewData["Title"] = "Crear Editorial";
+}
+
+<h1>Crear Editorial</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label for="publisherName" class="control-label">Nombre de la editorial</label>
+                <input asp-for="publisherName" class="form-control" />
+                <span asp-validation-for="publisherName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="address" class="control-label">Dirección</label>
+                <input asp-for="address" class="form-control" />
+                <span asp-validation-for="address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber" class="control-label">Teléfono</label>
+                <input asp-for="phoneNumber" class="form-control" />
+                <span asp-validation-for="phoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="email" class="control-label">Correo electrónico</label>
+                <input asp-for="email" class="form-control" />
+                <span asp-validation-for="email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="website" class="control-label">Sitio web</label>
+                <input asp-for="website" class="form-control" />
+                <span asp-validation-for="website" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label for="notes" class="control-label">Notas</label>
+                <input asp-for="notes" class="form-control" />
+                <span asp-validation-for="notes" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

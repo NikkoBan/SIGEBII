@@ -1,0 +1,56 @@
+﻿@model IEnumerable<SIGEBI.Web.Models.Publishers.PublishersViewModel>
+
+@{
+    ViewData["Title"] = "Editoriales";
+}
+
+<h1>Editoriales</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nueva</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre de la editorial</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Correo electrónico</th>
+            <th>Sitio web</th>
+            <th>Notas</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.publisherName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.phoneNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.website)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.notes)
+            </td>
+            <td>
+                @Html.ActionLink("Editar", "Edit", new {  id=item.id }) |
+                @Html.ActionLink("Detalles", "Details", new {  id=item.id })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

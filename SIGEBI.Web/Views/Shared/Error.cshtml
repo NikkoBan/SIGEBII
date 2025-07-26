@@ -1,0 +1,13 @@
+﻿@model SIGEBI.Web.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">Ocurrió un error al procesar tu solicitud.</h2>
+
+@if (Model?.RequestId != null)
+{
+    <div>
+        <strong>ID de solicitud:</strong> <code>@Model.RequestId</code>
+    </div>
+}

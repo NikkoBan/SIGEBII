@@ -1,0 +1,35 @@
+﻿@model SIGEBI.Web.Models.Publishers.PublishersViewModel
+
+@{
+    ViewData["Title"] = "Detalles de Editorial";
+}
+
+<h1>Detalles de la Editorial</h1>
+<hr />
+<dl class="row">
+    <dt class="col-sm-3">ID</dt>
+    <dd class="col-sm-9">@Model.id</dd>
+
+    <dt class="col-sm-3">Nombre de la editorial</dt>
+    <dd class="col-sm-9">@Model.publisherName</dd>
+
+    <dt class="col-sm-3">Dirección</dt>
+    <dd class="col-sm-9">@Model.address</dd>
+
+    <dt class="col-sm-3">Teléfono</dt>
+    <dd class="col-sm-9">@Model.phoneNumber</dd>
+
+    <dt class="col-sm-3">Correo electrónico</dt>
+    <dd class="col-sm-9">@Model.email</dd>
+
+    <dt class="col-sm-3">Sitio web</dt>
+    <dd class="col-sm-9">@Model.website</dd>
+
+    <dt class="col-sm-3">Notas</dt>
+    <dd class="col-sm-9">@Model.notes</dd>
+</dl>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver al listado</a>
+</div>

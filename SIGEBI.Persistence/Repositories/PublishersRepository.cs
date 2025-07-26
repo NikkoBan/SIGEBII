@@ -148,13 +148,13 @@ namespace SIGEBI.Persistence.Repositories
                 /* */
                
             }
-        public async Task<bool> ExistsByNameOrEmailAsync(string name, string email)
+        public async Task<bool> ExistsByNameOrEmailAsync(string name, string? email)
         {
             return await _dbContext.Publishers
                 .AnyAsync(p => p.PublisherName == name || p.Email == email && !p.IsDeleted);
         }
 
-        public async Task<bool> ExistsByNameOrEmailExceptIdAsync(string name, string email, int excludeId)
+        public async Task<bool> ExistsByNameOrEmailExceptIdAsync(string name, string? email, int excludeId)
         {
             return await _dbContext.Publishers
                 .AnyAsync(p => (p.PublisherName == name || p.Email == email) && p.ID != excludeId);

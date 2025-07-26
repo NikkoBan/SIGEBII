@@ -12,7 +12,7 @@ namespace SIGEBI.Domain.Entities
     public class LoanStatuses : AuditEntity<int>
     {
         public override int ID { get; set; }
-        public string StatusName { get; set; }
+        public string? StatusName { get; set; }
         public string? Description { get; set; }
     }
 }
