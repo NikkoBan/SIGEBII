@@ -1,11 +1,8 @@
 ﻿using SIGEBI.Domain.Base;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -14,6 +11,8 @@ namespace SIGEBI.Domain.Entities
         [Column("HistoryID")]
         [Key]
         public override int ID { get; set; }
+
+        public int LoanId { get; set; }
         public int OriginalLoanId { get; set; }
         public int BookId { get; set; }
         public int UserId { get; set; }
@@ -22,5 +21,10 @@ namespace SIGEBI.Domain.Entities
         public DateTime? ReturnDate { get; set; }
         public string FinalStatus { get; set; } = string.Empty;
         public string? Observations { get; set; }
+
+        public Loan? Loan { get; set; }
+        [JsonIgnore]
+
+        public virtual Loan? loan { get; set; }
     }
 }

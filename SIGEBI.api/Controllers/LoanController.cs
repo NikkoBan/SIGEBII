@@ -29,7 +29,7 @@ namespace SIGEBI.API.Controllers
             if (!RepoValidation.ValidarID(id))
                 return BadRequest("ID inválido.");
 
-            var loan = await _loanRepository.GetEntityByIdAsync(id);
+            var loan = await _loanRepository.GetLoanWithDetailsByIdAsync(id);
             if (loan == null)
                 return NotFound($"No se encontró el préstamo con ID {id}");
 

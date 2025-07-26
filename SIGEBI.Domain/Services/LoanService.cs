@@ -59,7 +59,8 @@ namespace SIGEBI.Domain.Services
                 DueDate = loan.DueDate,
                 ReturnDate = returnDate,
                 FinalStatus = "Devuelto",
-                Observations = observations
+                Observations = observations,
+                Loan = loan
             });
         }
 

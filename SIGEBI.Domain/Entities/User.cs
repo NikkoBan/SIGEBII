@@ -3,6 +3,7 @@ using SIGEBI.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using System.Text.Json.Serialization;
 
 namespace SIGEBI.Domain.Entities
 {
@@ -25,5 +26,7 @@ namespace SIGEBI.Domain.Entities
         public ICollection<Sanction>? Sanctions { get; set; }
         public ICollection<SpecialMaterial>? RequestedSpecialMaterials { get; set; }
         public ICollection<SpecialMaterial>? ApprovedSpecialMaterials { get; set; }
+        [JsonIgnore]
+        public virtual ICollection<Loan>? Loan { get; set; }
     }
 }

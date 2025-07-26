@@ -16,9 +16,13 @@ builder.Services.AddScoped<IBookAuthorRepository, BookAuthorRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<ILoanHistoryRepository, LoanHistoryRepository>();
+// Puedes seguir agregando más repositorios aquí...
 
-// Agregar controladores
-builder.Services.AddControllers();
+// Agregar controladores con opciones de serialización para evitar ciclos infinitos
+builder.Services.AddControllers().AddJsonOptions(x =>
+{
+    x.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+});
 
 // Agregar documentación Swagger
 builder.Services.AddEndpointsApiExplorer();

@@ -1,36 +1,39 @@
 ﻿using SIGEBI.Domain.Base;
-using System;
-using System.Collections.Generic;
+using SIGEBI.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
-namespace SIGEBI.Domain.Entities
+public class Book : BaseEntity<int>
 {
-    public class Book : BaseEntity<int>
-    {
-        [Column("BookID")]
-        [Key]
-        public override int ID { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string ISBN { get; set; } = string.Empty;
-        public DateTime? PublicationDate { get; set; }
-        public int CategoryId { get; set; }
-        public int PublisherId { get; set; }
-        public string Language { get; set; } = string.Empty;
-        public string? Summary { get; set; }
-        public int TotalCopies { get; set; }
-        public int AvailableCopies { get; set; }
-        public string GeneralStatus { get; set; } = string.Empty;
-        public Category? Category { get; set; }
-        public Publisher? Publisher { get; set; }
-        public ICollection<BookAuthor>? BookAuthors { get; set; }
-        public ICollection<Loan>? Loans { get; set; }
-        public ICollection<Reservation>? Reservations { get; set; }
-        public bool Borrado { get; set; } = false;
-        public int Stock => AvailableCopies;
+    [Column("BookID")]
+    [Key]
+    public override int ID { get; set; }
 
-    }
+    public string Title { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public DateTime? PublicationDate { get; set; }
+    public int CategoryId { get; set; }
+    public int PublisherId { get; set; }
+    public string Language { get; set; } = string.Empty;
+    public string? Summary { get; set; }
+    public int TotalCopies { get; set; }
+    public int AvailableCopies { get; set; }
+    public string GeneralStatus { get; set; } = string.Empty;
+    public bool Borrado { get; set; } = false;
+
+    [ForeignKey("CategoryId")]
+    public virtual Category? Category { get; set; }
+
+    [ForeignKey("PublisherId")]
+    public virtual Publisher? Publisher { get; set; }
+
+    public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new List<BookAuthor>();
+    public virtual ICollection<Loan> Loans { get; set; } = new List<Loan>();
+    public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
+    [JsonIgnore]
+    public virtual ICollection<Loan>? Loan { get; set; }
+    [NotMapped]
+    public int Stock => AvailableCopies;
+
 }

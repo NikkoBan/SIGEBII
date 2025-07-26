@@ -109,5 +109,15 @@ namespace SIGEBI.Persistence.Repositories
                 .Include(l => l.User)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Loan?> GetLoanWithDetailsByIdAsync(int id)
+        {
+            return await _context.Loans
+                .Include(l => l.Book)
+                .Include(l => l.User)
+                .Include(l => l.LoanHistories)
+                .FirstOrDefaultAsync(l => l.ID == id);
+        }
     }
 }
+

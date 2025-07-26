@@ -8,5 +8,6 @@ namespace SIGEBI.Persistence.Interfaces
         Task<List<Loan>> GetLoansByUser(int userId);
         Task<List<Loan>> GetOverdueLoans();
         Task<Loan?> GetActiveLoanByBook(int bookId);
+        Task<Loan?> GetLoanWithDetailsByIdAsync(int id);
     }
 }

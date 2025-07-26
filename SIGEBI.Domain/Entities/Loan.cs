@@ -1,27 +1,29 @@
 ﻿using SIGEBI.Domain.Base;
-using System;
-using System.Collections.Generic;
+using SIGEBI.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 
-namespace SIGEBI.Domain.Entities
+public class Loan : BaseEntity<int>
 {
-    public class Loan : BaseEntity<int>
-    {
-        [Column("LoanID")]
-        [Key]
-        public override int ID { get; set; }
-        public int BookId { get; set; }
-        public int UserId { get; set; }
-        public DateTime LoanDate { get; set; }
-        public DateTime DueDate { get; set; }
-        public DateTime? ReturnDate { get; set; }
-        public string LoanStatus { get; set; } = string.Empty;
-        public Book? Book { get; set; }
-        public User? User { get; set; }
-        public bool Borrado { get; set; } = false;
-    }
+    [Column("LoanID")]
+    [Key]
+    public override int ID { get; set; }
+
+    public int BookId { get; set; }
+    public int UserId { get; set; }
+
+    public DateTime LoanDate { get; set; }
+    public DateTime DueDate { get; set; }
+    public DateTime? ReturnDate { get; set; }
+    public string LoanStatus { get; set; } = string.Empty;
+    public bool Borrado { get; set; } = false;
+
+    [ForeignKey("BookId")]
+    public virtual Book? Book { get; set; }
+
+    [ForeignKey("UserId")]
+    public virtual User? User { get; set; }
+
+    public virtual ICollection<LoanHistory>? LoanHistories { get; set; }
 }
