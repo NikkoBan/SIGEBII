@@ -22,7 +22,6 @@ namespace SIGEBI.Persistence.Repositories
         {
         }
 
-        // Verificar duplicados 
         public async Task<bool> CheckDuplicateAuthorAsync(string firstName, string lastName, DateTime? birthDate)
         {
             try
@@ -38,7 +37,6 @@ namespace SIGEBI.Persistence.Repositories
                 return false;
             }
         }
-        //Dublicados al actualizar
         public async Task<bool> CheckDuplicateAuthorForUpdateAsync(int id, string firstName, string lastName, DateTime? birthDate)
         {
             try

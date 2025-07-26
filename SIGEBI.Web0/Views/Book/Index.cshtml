@@ -1,0 +1,113 @@
+﻿@model IEnumerable<SIGEBI.Web0.Models.BookModel>
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+<h1>Book</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Libro</a>
+
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.bookId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.isbn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.publicationDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.categoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.categoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.publisherId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.publisherName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.language)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.summary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.totalCopies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.availableCopies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.generalStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.isAvailable)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.bookId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.isbn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.publicationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.categoryId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.categoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.publisherId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.publisherName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.language)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.summary)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.totalCopies)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.availableCopies)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.generalStatus)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.isAvailable)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id=item.bookId}) |
+                    @Html.ActionLink("Details", "Details", new { id = item.bookId }) |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,27 +1,30 @@
 using Microsoft.EntityFrameworkCore;
-
-using SIGEBI.Persistence.Context;
-
 using SIGEBI.IOC.Dependencias;
-using SIGEBI.Application.Contracts.Service;
-using SIGEBI.Application.Services;
-
+using SIGEBI.Persistence.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Obtén la cadena de conexión
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddAutoMapper(typeof(Program));
-
+// Registra el DbContext UNA sola vez
 builder.Services.AddDbContext<SIGEBIContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Registro de dependencias por módulos, todo en una línea
+// Luego registra las dependencias
 builder.Services.RegisterSIGEBIDependencies();
 
-builder.Services.AddScoped<IAuthorService, AuthorService>();
+// Registra AutoMapper y otros servicios
+builder.Services.AddAutoMapper(typeof(Program));
 
-builder.Services.AddControllers();
+    builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    });
+
+
+
+// Configura Swagger (si es necesario)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -30,6 +33,7 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Configura el middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -39,4 +43,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

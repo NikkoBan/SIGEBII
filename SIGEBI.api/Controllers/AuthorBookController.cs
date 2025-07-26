@@ -22,7 +22,7 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var result = await _authorBookService.GetAllAsync();
-            return result.Success ? Ok(result.Data) : BadRequest(result.Message);
+            return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 
         // GET: api/AuthorBook/{bookId}/{authorId}
@@ -54,7 +54,7 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> GetBooksByAuthor(int authorId)
         {
             var result = await _authorBookService.GetBooksByAuthorAsync(authorId);
-            return result.Success ? Ok(result.Data) : NotFound(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
 
         // GET: api/AuthorBook/authors-by-book/{bookId}
@@ -62,7 +62,7 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> GetAuthorsByBook(int bookId)
         {
             var result = await _authorBookService.GetAuthorsByBookAsync(bookId);
-            return result.Success ? Ok(result.Data) : NotFound(result);
+            return result.Success ? Ok(result) : NotFound(result);
         }
     }
 }

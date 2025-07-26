@@ -67,7 +67,6 @@ namespace SIGEBI.Application.Services
             {
                 var entity = MapToEntity(dto);
 
-                // Auditoría centralizada aquí
                 entity.CreatedAt = DateTime.UtcNow;
                 entity.CreatedBy = "System";
                 entity.UpdatedAt = DateTime.UtcNow;

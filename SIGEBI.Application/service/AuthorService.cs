@@ -29,7 +29,7 @@ namespace SIGEBI.Application.Services
                     return OperationResult.FailureResult($"Autor con ID {authorId} no encontrado.");
 
                 var genres = await _authorRepository.GetGenresByAuthorAsync(authorId);
-                return OperationResult.SuccessResult(genres);
+                return OperationResult.SuccessResult(genres, "Generos obtenidos correctamente");
             }
             catch (Exception ex)
             {

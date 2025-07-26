@@ -23,7 +23,7 @@ namespace SIGEBI.api.Controllers
         {
             var result = await _bookService.GetAllAsync();
             return result.Success
-                ? Ok(result.Data)
+                ? Ok(result)
                 : StatusCode(500, new { Message = result.Message ?? "Error al obtener los libros." });
         }
 
@@ -33,14 +33,14 @@ namespace SIGEBI.api.Controllers
         {
             var result = await _bookService.GetByIdAsync(id);
             if (result.Success)
-                return result.Data != null ? Ok(result.Data) : NotFound($"Libro con ID {id} no encontrado.");
+                return result != null ? Ok(result) : NotFound($"Libro con ID {id} no encontrado.");
 
             return StatusCode(500, new { Message = result.Message ?? $"Error al obtener el libro con ID {id}." });
         }
 
         // POST: api/Book
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateBookDTO dto)
+        public async Task<IActionResult> Create([FromForm] CreateBookDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -54,11 +54,9 @@ namespace SIGEBI.api.Controllers
             if (!result.Success)
                 return BadRequest(result.Message ?? "Fallo al crear el libro.");
 
-            // ✔ Asegurarte que lo que viene es un BookDTO antes de usarlo
             if (result.Data is BookDTO bookDto)
                 return CreatedAtAction(nameof(GetById), new { id = bookDto.BookId }, bookDto);
 
-            // Si no es un BookDTO, algo raro pasó, pero ya se creó
             return Ok("Libro creado exitosamente, pero no se pudo obtener el ID.");
         }
 
@@ -75,7 +73,7 @@ namespace SIGEBI.api.Controllers
             var result = await _bookService.UpdateAsync(id, dto);
 
             if (result.Success)
-                return result.Data != null ? Ok(result.Data) : NoContent();
+                return result != null ? Ok(result) : NoContent();
 
             return result.Message?.ToLower().Contains("no encontrado") == true
                 ? NotFound(result.Message)

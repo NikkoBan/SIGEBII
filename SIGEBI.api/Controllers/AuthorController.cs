@@ -1,13 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Contracts.Service;
 using SIGEBI.Application.Dtos.AuthorDTO;
+using SIGEBI.IOC.Dependencias;
+using SIGEBI.Application.Services;
+
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace SIGEBI.api.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    
 
     public class AuthorController : ControllerBase
     {
@@ -24,7 +29,7 @@ namespace SIGEBI.api.Controllers
         {
             var result = await _authorService.GetAllAsync();
             return result.Success
-                ? Ok(result.Data)
+                ? Ok(result)
                 : StatusCode(500, new { Message = result.Message ?? "Error al obtener los autores." });
         }
 
@@ -35,14 +40,16 @@ namespace SIGEBI.api.Controllers
             var result = await _authorService.GetByIdAsync(id);
 
             if (result.Success)
-                return result.Data != null ? Ok(result.Data) : NotFound($"Autor con ID {id} no encontrado.");
+                return result != null ? Ok(result) : NotFound($"Autor con ID {id} no encontrado.");
 
             return StatusCode(500, new { Message = result.Message ?? $"Error al obtener el autor con ID {id}." });
         }
 
         // POST: api/Author
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateAuthorDTO dto)
+
+        
+        public async Task<IActionResult> Create([FromForm]  CreateAuthorDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -50,11 +57,9 @@ namespace SIGEBI.api.Controllers
             var result = await _authorService.CreateAsync(dto);
 
             if (!result.Success)
-                return BadRequest(result.Message ?? "Fallo al crear el autor.");
+                return BadRequest(result.Message ?? "No se pudo crear el autor.");
 
-            return result.Data is AuthorDTO author
-                ? CreatedAtAction(nameof(GetById), new { id = author.AuthorId }, author)
-                : Ok(result.Data);
+            return Ok(result.Message ?? "Autor creado correctamente.");
         }
 
         // PUT: api/Author/{id}
@@ -70,7 +75,7 @@ namespace SIGEBI.api.Controllers
             var result = await _authorService.UpdateAsync(id, dto);
 
             if (result.Success)
-                return result.Data != null ? Ok(result.Data) : NoContent();
+                return result != null ? Ok(result) : NoContent();
 
             return result.Message?.ToLower().Contains("no encontrado") == true
                 ? NotFound(result.Message)

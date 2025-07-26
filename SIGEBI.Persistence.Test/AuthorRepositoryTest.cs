@@ -99,7 +99,7 @@ namespace SIGEBI.Persistence.Test
             // Assert
             Assert.True(result.Success);
             var updated = await _context.Authors.FindAsync(author.Id);
-            Assert.Equal("Llosa Vargas", updated.LastName);
+            Assert.Equal("Llosa Vargas", updated!.LastName);
         }
 
         [Fact]
