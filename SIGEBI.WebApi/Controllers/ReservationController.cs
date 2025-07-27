@@ -28,7 +28,7 @@ namespace SIGEBI.WebApi.Controllers
 
         [HttpGet]
         //[ProducesResponseType(typeof(List<ReservationDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll() //probar
+        public async Task<IActionResult> GetAllReservations() //probar
         {
             try
             {
@@ -56,7 +56,7 @@ namespace SIGEBI.WebApi.Controllers
 
         // GET api/<ReservationController>/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetReservationById(int id)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace SIGEBI.WebApi.Controllers
 
         //POST api/<ReservationController>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateReservationRequestDto requestDto) //probar
+        public async Task<IActionResult> CreateReservation([FromBody] CreateReservationRequestDto requestDto) //probar
         {
             try
             {
@@ -109,7 +109,7 @@ namespace SIGEBI.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UpdateReservationRequestDto requestDto)
+        public async Task<IActionResult> UpdateReservation([FromBody] UpdateReservationRequestDto requestDto)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace SIGEBI.WebApi.Controllers
 
         // DELETE api/<ReservationController>/5
         [HttpDelete("{id}")]
-        public async Task< IActionResult> Delete(int id)
+        public async Task< IActionResult> DeleteReservation(int id)
         {
             try
             {
