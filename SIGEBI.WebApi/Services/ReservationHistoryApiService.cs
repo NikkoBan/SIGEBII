@@ -1,4 +1,5 @@
-﻿using SIGEBI.Application.Contracts.Services;
+﻿using System.Linq.Expressions;
+using SIGEBI.Application.Contracts.Services;
 using SIGEBI.Application.DTOs;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
@@ -14,68 +15,64 @@ namespace SIGEBI.WebApi.Services
             _reservationHistoryService = reservationHistoryService;
         }
 
-        public async Task<OperationResult> GetAllAsync() //falta este
+        private object MapToDto(ReservationHistory history)
         {
-            var result = await _reservationHistoryService.GetAllHistoriesAsync();
+            if (history == null)
+                throw new ArgumentNullException(nameof(history), "Reservation history cannot be null.");
 
-            if (!result.IsSuccess)
-                return result;
-
-            var histories = (List<ReservationHistory>)result.Data;
-
-            var dtoList = histories.Select(h => new GetAllReservationHistoryDto
+            return new ReservationHistoryDto
             {
-                HistoryId = h.ReservationHistoryId,
-                ReservationId = h.ReservationId,
-                BookTitle = h.Book?.Title ?? "", // Evita null
-                UserName = h.User?.FullName ?? "",
-                StatusName = h.ReservationStatus?.StatusName ?? "",
-                ReservationDate = h.ReservationDate,
-                ExpirationDate = h.ExpirationDate
-            }).ToList();
-
-            return OperationResult.Success("Reservation histories retrieved successfully.", dtoList);
-        }
-
-        public async Task<ReservationHistoryByIdDto> GetByIdAsync(int id)
-        {
-            if (id <= 0)
-                throw new InvalidOperationException("Invalid ID.");
-
-            var result = await _reservationHistoryService.GetHistoryByIdAsync(id);
-            var entity = result.Data as ReservationHistory;
-
-            if (entity == null)
-                throw new InvalidOperationException("Reservation history not found.");
-
-            return new ReservationHistoryByIdDto
-            {
-                HistoryId = entity.ReservationHistoryId,
-                ReservationId = entity.ReservationId,
-                StatusName = entity.ReservationStatus?.StatusName ?? "",
+                HistoryId = history.ReservationHistoryId,
+                ReservationId = history.ReservationId,
+                BookTitle = history.Book?.Title ?? string.Empty, 
+                UserName = history.User?.FullName ?? string.Empty,
+                StatusName = history.ReservationStatus?.StatusName ?? string.Empty,
+                ReservationDate = history.ReservationDate,
+                ExpirationDate = history.ExpirationDate
             };
         }
-        //public async Task<OperationResult> GetByIdAsync(int id)
-        //{
-        //    var result = await _reservationHistoryService.GetHistoryByIdAsync(id);
+        public async Task<OperationResult> GetAllAsync()
+        {
+            try
+            {
+                var result = await _reservationHistoryService.GetAllHistoriesAsync(x => true);
 
-        //    if (!result.IsSuccess)
-        //        return result;
+                if (!result.IsSuccess)
+                    return result;
 
-        //    var entity = result.Data as ReservationHistory;
+                // Use null-coalescing operator to handle possible null value
+                var histories = result.Data as List<ReservationHistory> ?? new List<ReservationHistory>();
 
-        //    if (entity == null)
-        //        return OperationResult.Failure("Invalid entity returned.");
+                var dtoList = histories.Select(h => MapToDto(h)).ToList();
 
-        //    var dto = new ReservationHistoryByIdDto
-        //    {
-        //        HistoryId = entity.ReservationHistoryId,
-        //        ReservationId = entity.ReservationId,
-        //        StatusName = entity.ReservationStatus?.StatusName ?? "",
+                return OperationResult.Success("Reservation histories retrieved successfully.", dtoList);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"An error occurred while retrieving reservation histories: {ex.Message}");
+            }
+        }
 
-        //    };
+        public async Task<OperationResult> GetByIdAsync(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    throw new InvalidOperationException("Invalid ID.");
 
-        //    return OperationResult.Success("Reservation history retrieved successfully.", dto);
-        //}
+                var result = await _reservationHistoryService.GetHistoryByIdAsync(id);
+
+                if (!result.IsSuccess || result.Data is not ReservationHistory history)
+                    throw new InvalidOperationException("Reservation history not found.");
+
+                var dto = MapToDto(history);
+
+                return OperationResult.Success("Reservation history retrieved successfully.", dto);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"An error occurred while retrieving reservation history: {ex.Message}");
+            }
+        }
     }
 }

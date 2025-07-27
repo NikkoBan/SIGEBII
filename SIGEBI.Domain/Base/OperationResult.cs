@@ -5,7 +5,7 @@ namespace SIGEBI.Domain.Base
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; } = string.Empty;
-        public dynamic? Data { get; set; } 
+        public dynamic? Data { get; set; }
         public OperationResult() { }
 
         protected OperationResult(bool isSuccess, string message, dynamic? data = null)
@@ -18,10 +18,15 @@ namespace SIGEBI.Domain.Base
         {
             return new OperationResult(true, message, data);
         }
-        public static OperationResult Failure(string message)
+        public static OperationResult Failure(string message, List<System.ComponentModel.DataAnnotations.ValidationResult> validationResults)
         {
             return new OperationResult(false, message);
         }
 
+        public static OperationResult Failure(string message)
+        {
+            return new OperationResult(false, message);
+
+        }
     }
 }

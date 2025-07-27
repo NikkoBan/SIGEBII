@@ -14,7 +14,7 @@ namespace SIGEBI.Domain.Entities.circulation
         public required string LoanStatus { get; set; } 
         
         public virtual Books? Book { get; set; }
-        public virtual Users? User { get; set; } 
+        public virtual User? User { get; set; } 
 
         public virtual ICollection<LoanHistory> LoanHistories { get; set; } = new List<LoanHistory>();
     }

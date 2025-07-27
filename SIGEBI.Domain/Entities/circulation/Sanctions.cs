@@ -15,6 +15,6 @@ namespace SIGEBI.Domain.Entities.circulation
         public required string Reason { get; set; }
         public required string SanctionStatus { get; set; } 
 
-        public required virtual Users User { get; set; } 
+        public required virtual User User { get; set; } 
     }
 }

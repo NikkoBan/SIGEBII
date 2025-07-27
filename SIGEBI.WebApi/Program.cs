@@ -7,12 +7,15 @@ using SIGEBI.Application.Services;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Logging;
 using SIGEBI.Persistence.Repositories;
+using SIGEBI.WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<SIGEBIContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SIGEBIConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SIGEBIConnection"),
+    sqlOptions => sqlOptions.EnableRetryOnFailure()
+    ));
 
 builder.Services.AddScoped(typeof(IAppLogger<>), typeof(LoggerAdapter<>));
 
@@ -26,12 +29,18 @@ builder.Services.AddScoped<IReservationHistoryRepository, ReservationHistoryRepo
 builder.Services.AddTransient<IReservationService, ReservationService>();
 builder.Services.AddTransient<IReservationStatusService, ReservationStatusService>();
 builder.Services.AddTransient<IReservationHistoryService, ReservationHistoryService>();
+builder.Services.AddTransient<IBookService, FakeBookService>();
 
 builder.Services.AddScoped<ReservationApiService>();
+builder.Services.AddScoped<ReservationHistoryApiService>();
+builder.Services.AddScoped<ReservationStatusApiService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 var app = builder.Build();
 

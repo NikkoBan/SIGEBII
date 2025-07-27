@@ -69,22 +69,53 @@ namespace SIGEBI.Persistence.Repositories
         {
             return await _context.Reservations.AnyAsync(filter);
         }
-        public async Task<OperationResult> GetAllAsync(Expression<Func<Reservation, bool>> filter)
+        public async Task<OperationResult> GetAllAsync(Expression<Func<Reservation, bool>> filter = null)
         {
             OperationResult operationResult = new OperationResult();
 
             try
             {
-                _logger.LogInformation("Retrieving reservations with filter.");
-                operationResult.Data = await _context.Reservations.Where(filter).ToListAsync();
+                _logger.LogInformation("Retrieving reservations with filter: {Filter}.", filter?.ToString() ?? "No filter");
 
-                operationResult = OperationResult.Success("Retrieving reservations entities.", operationResult.Data);
-                _logger.LogInformation("Reservations retrieved: {@Data}", operationResult.Data);
+                var query = _context.Reservations
+                    .Include(r => r.Book) 
+                    .Include(r => r.User) 
+                    .AsQueryable();
+
+                if (filter != null)
+                    query = query.Where(filter);
+
+                List<Reservation> reservations;
+                try
+                {
+                    reservations = await query.ToListAsync();
+
+                    //logs 
+                    foreach (var r in reservations)
+                    {
+                        if (r.Book == null) _logger.LogWarning("Book null for reservation {Id}", r.Id);
+                        if (r.User == null) _logger.LogWarning("User null for reservation {Id}", r.Id);
+                        if (r.StatusId == 0) _logger.LogWarning("StatusId is 0 for reservation {Id}", r.Id);
+                        if (r.ReservationDate == default) _logger.LogWarning("ReservationDate default for {Id}", r.Id);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while executing ToListAsync on reservations query");
+                    throw;
+                }
+                
+                return OperationResult.Success("No reservations found.", reservations ?? new List<Reservation>());
+                
+
+                //_logger.LogInformation("Reservations retrieved successfully: {@Data}", reservations);
+
+                //return OperationResult.Success("Reservations retrieved successfully.", reservations);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving reservations.");
-                operationResult = OperationResult.Failure("An error occurred retrieving reservations: " + ex.Message);
+                operationResult = OperationResult.Failure("An error occurred retrieving reservations: " + ex.Message); 
             }
 
             return operationResult;

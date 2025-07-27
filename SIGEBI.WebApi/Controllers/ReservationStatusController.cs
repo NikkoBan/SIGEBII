@@ -18,31 +18,49 @@ namespace SIGEBI.WebApi.Controllers
         }
         // GET: api/<ReservationStatusController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationStatusDto>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = await _reservationStatusService.GetAllStatusesAsync();
+                var result = await _reservationStatusService.GetAllStatusesAsync(x => true);
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new
+                    {
+                        result.Message,
+                        result.IsSuccess
+                    });
+                }
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { Message = ex.Message, Success = false });
             }
         }
 
         // GET api/<ReservationStatusController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReservationStatusDto>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _reservationStatusService.GetStatusByIdAsync(id);
+
+                if (!result.IsSuccess)
+                {
+                    return NotFound(new
+                    {
+                        result.Message,
+                        result.IsSuccess
+                    });
+                }
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message);
+                return StatusCode(500, new { Message = ex.Message, Success = false });
             }
         }
 

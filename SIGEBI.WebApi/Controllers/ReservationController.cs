@@ -1,6 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics.Eventing.Reader;
+using System.Linq.Expressions;
+using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SIGEBI.api.Services;
 using SIGEBI.Application.DTOs;
+using SIGEBI.Domain.Entities.circulation;
+using SIGEBI.Persistence.Context;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,60 +18,138 @@ namespace SIGEBI.WebApi.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly ReservationApiService _reservationApiService; // Injecting the ReservationApiService
+        private readonly SIGEBIContext _context;
 
-        public ReservationController(ReservationApiService reservationApiService)
+        public ReservationController(ReservationApiService reservationApiService, SIGEBIContext context)
         {
             _reservationApiService = reservationApiService;
+            _context = context;
         }
 
-        // GET: api/<ReservationController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationDto>>> GetAll()
+        //[ProducesResponseType(typeof(List<ReservationDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll() //probar
         {
-            var reservation = await _reservationApiService.GetAllReservationsAsync(); //linea 24
-            return Ok(reservation);
+            try
+            {
+                Expression<Func<Reservation, bool>> filter = null;
 
+                var result = await _reservationApiService.GetAllReservationsAsync(filter);
+
+                if (!result.IsSuccess)
+                    return BadRequest(new
+                    {
+                        Message = result.Message,
+                        Success = result.IsSuccess
+                    });
+                return Ok(result.Data);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
         }
 
         // GET api/<ReservationController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReservationDto>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                var reservation = await _reservationApiService.GetReservationByIdAsync(id);
-                return Ok(reservation);
+                var result = await _reservationApiService.GetReservationByIdAsync(id);
+
+                if (!result.IsSuccess)
+                    return NotFound(new
+                    {
+                        result.Message,
+                        result.IsSuccess
+                    });
+                return Ok(result);
+
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message); // Return 404 if reservation not found
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
             }
         }
 
-        // POST api/<ReservationController>
+        //POST api/<ReservationController>
         [HttpPost]
-        public async Task<ActionResult<ReservationDto>> Create([FromBody] CreateReservationRequestDto requestDto)
+        public async Task<IActionResult> Create([FromBody] CreateReservationRequestDto requestDto) //probar
         {
             try
             {
                 var createdReservation = await _reservationApiService.CreateReservationAsync(requestDto);
-                return CreatedAtAction(nameof(GetById), new { id = createdReservation.ReservationId }, createdReservation);
+                //return CreatedAtAction(nameof(GetById), new { id = createdReservation.Data }, createdReservation.Data); 
+
+                if (!createdReservation.IsSuccess)
+                    return BadRequest(new
+                    {
+                        createdReservation.Message,
+                        createdReservation.IsSuccess
+                    });
+                return Ok(createdReservation);
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message); // Return 400 if creation fails
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
             }
-           
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Update([FromBody] UpdateReservationRequestDto requestDto)
+        {
+            try
+            {
+                var updatedReservation = await _reservationApiService.UpdateReservationAsync(requestDto);
+
+                if (!updatedReservation.IsSuccess)
+                return BadRequest(new
+                {
+                    updatedReservation.Message,
+                    updatedReservation.IsSuccess
+                });
+                return Ok(updatedReservation);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = ex.Message,
+                    Success = false
+                });
+            }
         }
 
         // DELETE api/<ReservationController>/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id, [FromQuery] string deletedBy)
+        public async Task< IActionResult> Delete(int id)
         {
             try
             {
-                await _reservationApiService.DeleteReservationAsync(id, deletedBy);
-                return NoContent(); // Return 204 
+               var deleted = await _reservationApiService.DeleteReservationAsync(id);
+
+                if (!deleted.IsSuccess)
+                    return NotFound(new
+                    {
+                        deleted.Message,
+                        deleted.IsSuccess
+                    });
+
+                return Ok(deleted);
+
             }
             catch (InvalidOperationException ex)
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.DTOs;
+using SIGEBI.Domain.Base;
 using SIGEBI.WebApi.Services;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -18,26 +19,44 @@ namespace SIGEBI.WebApi.Controllers
         }
         // GET: api/<ReservationHistoryController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetAllReservationHistoryDto>>> GetAll()
+        public async Task<IActionResult>GetAll() //fix it
         {
             try
             {
                 var result = await _reservationHistoryApiService.GetAllAsync();
+
+                if (!result.IsSuccess)
+                {
+                    return BadRequest(new
+                    {
+                        result.Message,
+                        result.IsSuccess
+                    });
+                }
                 return Ok(result);
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { Message = ex.Message, Success = false });
             }
         }
 
         // GET api/<ReservationHistoryController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReservationHistoryByIdDto>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var result = await _reservationHistoryApiService.GetByIdAsync(id);
+
+                if (!result.IsSuccess)
+                {
+                    return NotFound(new
+                    {
+                        result.Message,
+                        result.IsSuccess
+                    });
+                }
                 return Ok(result);
             }
             catch (InvalidOperationException ex)

@@ -14,49 +14,66 @@ namespace SIGEBI.WebApi.Services
             _reservationStatusService = reservationStatusService;
         }
 
-        public async Task<IEnumerable<ReservationStatusDto>> GetAllAsync()
+        private object MapToDto(ReservationStatus status)
         {
-            var result = await _reservationStatusService.GetAllStatusesAsync();
-
-            if (!result.IsSuccess || result.Data == null)
-                throw new InvalidOperationException(result.Message);
-
-            var statuses = (List<ReservationStatus>)result.Data;
-
-            return statuses.Select(s => new ReservationStatusDto
-            {
-                StatusId = s.Id,
-                StatusName = s.StatusName
-            }).ToList();
-        }
-
-        public async Task<ReservationStatusDto> GetByIdAsync(int id)
-        {
-            if (id <= 0)
-                throw new InvalidOperationException("Invalid reservation status ID.");
-
-            var result = await _reservationStatusService.GetStatusByIdAsync(id);
-
-            var status = result.Data as ReservationStatus;
             if (status == null)
-                throw new InvalidOperationException("Reservation status not found.");
+                throw new ArgumentNullException(nameof(status), "Reservation status cannot be null.");
 
             return new ReservationStatusDto
             {
                 StatusId = status.Id,
                 StatusName = status.StatusName
-            };
+            };      
+        }
 
-            //public async Task<OperationResult> GetAllStatusesAsync()
-            //{
-            //    return await _reservationStatusService.GetAllStatusesAsync();
+        public async Task<OperationResult> GetAllAsync()
+        {
+            try
+            {
+                var result = await _reservationStatusService.GetAllStatusesAsync(x => true);
 
-            //}
+                if (!result.IsSuccess || result.Data == null)
+                    throw new InvalidOperationException(result.Message);
 
-            //public async Task<OperationResult> GetStatusByIdAsync(int id)
-            //{
-            //    return await _reservationStatusService.GetStatusByIdAsync(id);
-            //}
+                var status = result.Data as List<ReservationStatus>;
+                if (status == null)
+                    throw new InvalidOperationException("Failed to cast result data to List<ReservationStatus>.");
+
+                var dtos = status.Select(MapToDto).ToList();
+
+                return OperationResult.Success("Statuses retrieved successfully", dtos);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error retrieving reservation statuses: {ex.Message}");
+            }
+        }
+
+        public async Task<OperationResult> GetByIdAsync(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    throw new InvalidOperationException("Invalid reservation status ID.");
+
+                var result = await _reservationStatusService.GetStatusByIdAsync(id);
+
+                if (!result.IsSuccess || result.Data == null)
+                    return OperationResult.Failure("Reservation status not found.");
+
+                var status = result.Data as ReservationStatus;
+
+                if (status == null) 
+                    throw new InvalidOperationException("Failed to cast result data to ReservationStatus.");
+
+                var dto = MapToDto(status);
+
+                return OperationResult.Success("Reservation status retrieved successfully.", dto);
+            }
+            catch (Exception ex)
+            {
+                return OperationResult.Failure($"Error retrieving reservation status: {ex.Message}");
+            }
         }
     }
 }

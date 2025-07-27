@@ -12,9 +12,6 @@ namespace SIGEBI.Application.Contracts.Repositories.Reservations
         Task<bool> ExistsAsync(Expression<Func<Reservation, bool>> filter);
         Task<OperationResult> AddAsync(Reservation entity);
         Task<OperationResult> UpdateAsync(Reservation entity);
-        Task<OperationResult> DisableAsync(int reservationId, string deletedBy);
-        //Task<OperationResult> DeleteAsync(Reservation entity);
-        Task<OperationResult> ConfirmReservationAsync(int reservationId);
-        Task<OperationResult> ExpireConfirmedReservationsAsync();
+        Task<OperationResult> DeleteAsync(Reservation entity);
     }
 }

@@ -6,6 +6,7 @@ using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.circulation;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Application.DTOs;
+using Microsoft.Extensions.Logging;
 
 namespace SIGEBI.Persistence.Repositories
 {
@@ -18,6 +19,25 @@ namespace SIGEBI.Persistence.Repositories
         {
             _context = context;
             _logger = logger;
+        }
+        public async Task<string> GetStatusNameByIdAsync(int statusId)
+        {
+            try
+            {
+                var status = await _context.ReservationStatuses.FindAsync(statusId);
+
+                if (status == null)
+                {
+                    _logger.LogWarning("Reservation status with Id {Id} not found.", statusId);
+                    return "Status not found"; // Fix: Return a string instead of OperationResult
+                }
+                return status.StatusName; // Fix: Return the StatusName directly as a string
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving reservation status by Id: {Id}, Message: {Message}", statusId, ex.Message);
+                return $"Status unknown: {ex.Message}"; // Fix: Return a string instead of OperationResult
+            }
         }
         private async Task<ReservationStatus?> FindReservationStatusAsync(int id)
         {
@@ -60,6 +80,7 @@ namespace SIGEBI.Persistence.Repositories
 
         public async Task<OperationResult> GetByIdAsync(int id)
         {
+         
             OperationResult operationResult = new OperationResult();
 
             try

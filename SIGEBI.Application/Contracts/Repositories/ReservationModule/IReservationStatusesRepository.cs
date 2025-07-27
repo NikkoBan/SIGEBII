@@ -8,5 +8,6 @@ namespace SIGEBI.Application.Contracts.Repositories.Reservations
         Task<OperationResult> GetByIdAsync(int id);
         Task<OperationResult> GetAllAsync(Expression<Func<ReservationStatus, bool>> filter);
         Task<bool> ExistsAsync(Expression<Func<ReservationStatus, bool>> filter);
+        Task <string> GetStatusNameByIdAsync(int id);
     }
 }

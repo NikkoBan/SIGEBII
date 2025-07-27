@@ -1,4 +1,5 @@
-﻿using SIGEBI.Application.Contracts.Repositories;
+﻿using System.Linq.Expressions;
+using SIGEBI.Application.Contracts.Repositories;
 using SIGEBI.Application.Contracts.Repositories.Reservations;
 using SIGEBI.Application.Contracts.Services;
 using SIGEBI.Application.DTOs;
@@ -18,7 +19,7 @@ namespace SIGEBI.Application.Services
             _reservationStatusesRepository = reservationStatusesRepository;
         }
 
-        public async Task<OperationResult> GetAllStatusesAsync()
+        public async Task<OperationResult> GetAllStatusesAsync(Expression<Func<ReservationStatus, bool>> filter)
         {
             var result = await _reservationStatusesRepository.GetAllAsync(x => true);
 
@@ -27,51 +28,23 @@ namespace SIGEBI.Application.Services
                 return OperationResult.Failure(result.Message);
             }
 
-            var statuses = new List<ReservationStatusDto>();
-
-            foreach (var item in result.Data) 
-            {
-                var dto = new ReservationStatusDto
-                {
-                    Id = item.Id,
-                    StatusName = item.StatusName,
-                    Description = item.Description
-                };
-                statuses.Add(dto);
-            }
-
-            return OperationResult.Success("Reservation statuses retrieved successfully.", statuses);
+            return OperationResult.Success("Reservation statuses retrieved successfully.", result.Data);
         }
 
         public async Task<OperationResult> GetStatusByIdAsync(int id)
         {
-            if (id <= 0)
+            var validationResult = ReservationValidator.ValidateReservationId(id);
+            if (!validationResult.IsSuccess)
             {
-                return OperationResult.Failure("Invalid reservation status ID.");
+                return validationResult;
             }
 
             var result = await _reservationStatusesRepository.GetByIdAsync(id);
 
             if (!result.IsSuccess)
-            {
                 return OperationResult.Failure(result.Message);
-            }
 
-            var status = result.Data as ReservationStatus;
-
-            if (status == null)
-            {
-                return OperationResult.Failure("Reservation status not found.");
-            }
-
-            var dto = new ReservationStatusDto
-            {
-                Id = status.Id,
-                StatusName = status.StatusName,
-                Description = status.Description
-            };
-
-            return OperationResult.Success("Reservation status retrieved successfully.", dto);
+            return OperationResult.Success("Reservation status retrieved successfully.", result.Data);          
         }
     }
 }
