@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SIGEBI.Application.Validation;
 
 namespace SIGEBI.Persistence.Repositori
 {
@@ -112,10 +111,7 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> RegisterAsync(User user)
         {
-            if (!UserValidation.IsValid(user))
-            {
-                return OperationResult.Fail("Datos de usuario inválidos para el registro.");
-            }
+            
 
             var existingUser = await _userRepository.GetByEmailAsync(user.InstitutionalEmail);
             if (existingUser != null)
@@ -161,10 +157,7 @@ namespace SIGEBI.Persistence.Repositori
 
         public async Task<OperationResult> UpdateUserAsync(User user)
         {
-            if (!UserValidation.IsValid(user))
-            {
-                return OperationResult.Fail("Datos de usuario inválidos para la actualización.");
-            }
+           
 
             var existing = await _userRepository.GetByIdAsync(user.UserId);
             if (existing == null)

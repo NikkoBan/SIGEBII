@@ -1,39 +1,49 @@
-// SIGEBI.Web/Program.cs
-
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration; // Necesario para IConfiguration
+using SIGEBI.Web.Repositories;
+using SIGEBI.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews(); // Habilita el patrón MVC
+builder.Services.AddControllersWithViews();
 
-// --- Configuración CRÍTICA para consumo de API (basado en el video) ---
-builder.Services.AddHttpClient(); // Registra HttpClientFactory para inyectar HttpClient
+// --- Registro de HttpClient para consumo de API REST ---
+builder.Services.AddHttpClient(); // Para inyectar HttpClient manualmente si alguna vez lo necesitas directo
+
+// Registro de repositorios (patrón Repository para consumo de API)
+builder.Services.AddHttpClient<IUserApiRepository, UserApiRepository>();
+builder.Services.AddHttpClient<IUserHistoryApiRepository, UserHistoryApiRepository>();
+
+// Registro de ApiClients (si prefieres usar clases directas tipo ApiClient)
+builder.Services.AddHttpClient<UserApiClient>();
+builder.Services.AddHttpClient<UserHistoryApiClient>();
+
+// ... Puedes agregar aquí otros servicios, autenticación, etc.
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); // Para ver errores detallados en desarrollo
+    app.UseDeveloperExceptionPage();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error"); // Página de error personalizada para producción
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection(); // Redirige las solicitudes HTTP a HTTPS
-app.UseStaticFiles();      // Permite servir archivos estáticos (CSS, JS, imágenes) desde wwwroot
+app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // Si usas autenticación (ej. cookies de ASP.NET Core Identity)
-app.UseAuthorization();  // Habilita el middleware de autorización
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); // Establece Home/Index como la ruta por defecto
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
