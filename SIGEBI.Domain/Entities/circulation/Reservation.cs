@@ -31,6 +31,7 @@ namespace SIGEBI.Domain.Entities.circulation
 
         public virtual Books Book { get; set; } // propiedad de navegacion
         public virtual User User { get; set; } // propiedad de navegacion
-        //public virtual ReservationStatus ReservationStatus { get; set; } // propiedad de navegacion
+        [ForeignKey("StatusId")]
+        public virtual ReservationStatus ReservationStatus { get; set; } // propiedad de navegacion
     }
 }

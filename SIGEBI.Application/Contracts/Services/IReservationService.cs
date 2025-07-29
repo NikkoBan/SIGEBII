@@ -12,10 +12,6 @@ namespace SIGEBI.Application.Contracts.Services
         Task<OperationResult> GetReservationByIdAsync(int id);
         Task<OperationResult> CreateReservationAsync(CreateReservationRequestDto request);
         Task<OperationResult> UpdateReservationAsync(UpdateReservationRequestDto request);
-        Task<OperationResult> DeleteReservationAsync(int id);
-        
-
-        //Task<OperationResult> ConfirmReservationAsync(ConfirmReservationRequestDto request);
-        //Task<OperationResult> ExpireConfirmedReservationsAsync();
+        Task<OperationResult> DeleteReservationAsync(int id);      
     }
 }

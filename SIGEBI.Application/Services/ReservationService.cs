@@ -14,13 +14,12 @@ namespace SIGEBI.Application.Services
     public class ReservationService : IReservationService
     {
         private readonly IReservationRepository _reservationRepository;
-        private readonly IReservationStatusesRepository _reservationStatusesRepository;
         private readonly IBookService _bookService;
+        private readonly object _logger;
 
-        public ReservationService(IReservationRepository reservationRepository, IReservationStatusesRepository reservationStatusesRepository)
+        public ReservationService(IReservationRepository reservationRepository)
         {
             _reservationRepository = reservationRepository;
-            _reservationStatusesRepository = reservationStatusesRepository;
         }
         public async Task<OperationResult> CreateReservationAsync(CreateReservationRequestDto request)
         {
@@ -73,37 +72,48 @@ namespace SIGEBI.Application.Services
             return await _reservationRepository.UpdateAsync(reservationToDelete);
         } //funciona
 
-        public async Task<OperationResult> GetAllReservationsAsync(Expression<Func<Reservation, bool>> filter = null) //terminar de modificar
+        public async Task<OperationResult> GetAllReservationsAsync(Expression<Func<Reservation, bool>> filter = null)
         {
             var result = await _reservationRepository.GetAllAsync(filter);
 
-            if (!result.IsSuccess)
+            if (!result.IsSuccess || result.Data == null)
             {
-                return result;
+                return OperationResult.Failure("Error al recuperar las reservas: " + result.Message);
             }
 
-            if (result.Data == null)
+            var reservations = result.Data as IEnumerable<Reservation>;
+
+            if (reservations == null)
             {
-                return OperationResult.Failure("No reservations found.");
+                return OperationResult.Failure("Tipo de datos inesperado al recuperar las reservas.");
             }
 
             var dtoList = new List<ReservationDto>();
 
             foreach (var r in reservations)
             {
-                var statusName = r.StatusId != 0 ? await _reservationStatusesRepository.GetStatusNameByIdAsync(r.StatusId) ?? "Estado desconocido" : "Estado desconocido";
-                dtoList.Add(new ReservationDto
+                try
                 {
-                    ReservationId = r.Id,
-                    UserName = r.User?.FullName ?? "Usuario desconocido",
-                    BookTitle = r.Book?.Title ?? "Titulo desconocido",
-                    ReservationDate = r.ReservationDate,
-                    ExpirationDate = r.ExpirationDate,
-                    StatusName = statusName ?? "Estado desconocido",
-                });
+                    var dto = new ReservationDto
+                    {
+                        ReservationId = r.Id,
+                        UserName = r.User?.FullName ?? "Usuario desconocido",
+                        BookTitle = r.Book?.Title ?? "Título desconocido",
+                        ReservationDate = r.ReservationDate,
+                        ExpirationDate = r.ExpirationDate,
+                        StatusName = r.ReservationStatus?.StatusName ?? "Estado desconocido"
+                    };
+
+                    dtoList.Add(dto);
+                }
+                catch (Exception ex)
+                {
+                    _ = (ex, "Error al mapear la reserva ID: {Id}", r?.Id);
+                    continue;
+                }
             }
 
-            return OperationResult.Success("Reservations retrieved successfully.", dtoList);
+            return OperationResult.Success("Reservas obtenidas correctamente", dtoList);
         }
 
         public Task<OperationResult> GetReservationByIdAsync(int id)
@@ -161,13 +171,13 @@ namespace SIGEBI.Application.Services
             }
             return await _reservationRepository.UpdateAsync(reservation);
 
-            var status = await _reservationStatusesRepository.GetStatusNameByIdAsync(existingReservation.StatusId);
+            //var status = await _reservationStatusesRepository.GetStatusNameByIdAsync(existingReservation.StatusId);
 
             var response = new ReservationUpdateResponseDto
             {
                 ReservationId = existingReservation.Id,
                 BookId = existingReservation.BookId,
-                StatusName = status,
+                StatusName = existingReservation.ReservationStatus?.StatusName ?? "Unknown", 
                 UpdatedAt = (DateTime)existingReservation.UpdatedAt
             };
             return OperationResult.Success("Reservation updated successfully.", response);
