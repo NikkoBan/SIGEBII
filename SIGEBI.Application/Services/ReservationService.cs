@@ -87,8 +87,6 @@ namespace SIGEBI.Application.Services
                 return OperationResult.Failure("No reservations found.");
             }
 
-            var reservations = (result.Data as IEnumerable<Reservation>) ?? new List<Reservation>();
-
             var dtoList = new List<ReservationDto>();
 
             foreach (var r in reservations)
