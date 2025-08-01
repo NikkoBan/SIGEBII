@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SIGEBI.Web.Services;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace SIGEBI.Web
 {
@@ -13,8 +16,28 @@ namespace SIGEBI.Web
             // Agregar servicios al contenedor
             builder.Services.AddControllersWithViews();
 
-            // Si necesitas consumir APIs con HttpClientFactory
+            // Registro de servicios para el consumo de APIs mediante HttpClientFactory
             builder.Services.AddHttpClient();
+            builder.Services.AddScoped<IHttpService, HttpService>();
+            builder.Services.AddScoped<IPublishersHttpService, PublishersHttpService>();
+            builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+
+            // Configuración de Rate Limiting
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 100, // Máximo de solicitudes
+                            Window = TimeSpan.FromMinutes(1), // Por minuto
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                            QueueLimit = 0
+                        }));
+                options.RejectionStatusCode = 429;  // Codigo HTTP cuando se supera el limite 
+            });
 
             var app = builder.Build();
 
@@ -27,6 +50,8 @@ namespace SIGEBI.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseRateLimiter();
 
             app.UseAuthorization();
 

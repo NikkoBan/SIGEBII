@@ -1,44 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Web.Models.Publishers;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
+using SIGEBI.Web.Services;
 using System.Threading.Tasks;
 
 namespace SIGEBI.Web.Controllers
 {
     public class PublishersController : Controller
     {
-        private readonly HttpClient _httpClient;
-        private readonly string _apiBaseUrl = "https://localhost:7276/api/Publishers";
+        private readonly IPublishersHttpService _publishersService;
+        private readonly INotificationService _notificationService;
 
-        public PublishersController(IHttpClientFactory httpClientFactory)
+        public PublishersController(IPublishersHttpService publishersService, INotificationService notificationService)
         {
-            _httpClient = httpClientFactory.CreateClient();
+            _publishersService = publishersService;
+            _notificationService = notificationService;
         }
 
         // GET: Publishers
         public async Task<IActionResult> Index()
         {
-            List<PublishersViewModel> publishers = new();
-            try
-            {
-                var response = await _httpClient.GetAsync(_apiBaseUrl);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    publishers = JsonSerializer.Deserialize<List<PublishersViewModel>>(responseString) ?? new List<PublishersViewModel>();
-                }
-                else
-                {
-                    ViewBag.Message = "No se pudo obtener la lista de editoriales.";
-                }
-            }
-            catch
-            {
-                ViewBag.Message = "Error al obtener la lista de editoriales.";
-            }
+            var publishers = await _publishersService.GetAllAsync();
             return View(publishers);
         }
 
@@ -47,38 +28,14 @@ namespace SIGEBI.Web.Controllers
         {
             if (id <= 0)
             {
-                ViewBag.Message = "ID inválido.";
+                _notificationService.Warning("ID inválido.");
                 return View(null);
             }
 
-            PublishersViewModel? publisher = null;
-            try
+            var publisher = await _publishersService.GetByIdAsync(id);
+            if (publisher == null)
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                if (response.IsSuccessStatusCode)
-                {
-                    publisher = JsonSerializer.Deserialize<PublishersViewModel>(responseString) ?? new PublishersViewModel
-                    {
-                        id = 0,
-                        publisherName = string.Empty,
-                        address = string.Empty,
-                        phoneNumber = string.Empty,
-                        email = string.Empty,
-                        website = string.Empty,
-                        notes = string.Empty
-                    };
-                }
-                else
-                {
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponseModel<object>>(responseString);
-                    ViewBag.Message = apiResponse?.message ?? "Editorial no encontrada.";
-                }
-            }
-            catch
-            {
-                ViewBag.Message = "Error al obtener la editorial.";
+                _notificationService.Info("Editorial no encontrada.");
             }
             return View(publisher);
         }
@@ -97,21 +54,15 @@ namespace SIGEBI.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            try
-            {
-                var response = await _httpClient.PostAsJsonAsync(_apiBaseUrl, model);
-                var responseString = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponseModel<PublishersViewModel>>(responseString);
+            var response = await _publishersService.CreateAsync(model);
 
-                if (response.IsSuccessStatusCode && apiResponse?.success == true)
-                    return RedirectToAction(nameof(Index));
-
-                ViewBag.Message = apiResponse?.message ?? "Error al crear la editorial.";
-            }
-            catch
+            if (response?.success == true)
             {
-                ViewBag.Message = "Error al crear la editorial.";
+                _notificationService.Success("Editorial creada correctamente.");
+                return RedirectToAction(nameof(Index));
             }
+
+            _notificationService.Error(response?.message ?? "Error al crear la editorial.");
             return View(model);
         }
 
@@ -120,56 +71,28 @@ namespace SIGEBI.Web.Controllers
         {
             if (id <= 0)
             {
-                ViewBag.Message = "ID inválido.";
+                _notificationService.Warning("ID inválido.");
                 return View(null);
             }
 
-            PublisherUpdateModel? updateModel = null;
-            try
+            var publisher = await _publishersService.GetByIdAsync(id);
+            if (publisher == null)
             {
-                var response = await _httpClient.GetAsync($"{_apiBaseUrl}/{id}");
-                var responseString = await response.Content.ReadAsStringAsync();
+                _notificationService.Info("Editorial no encontrada.");
+                return View(null);
+            }
 
-                if (response.IsSuccessStatusCode)
-                {
-                    var publisher = JsonSerializer.Deserialize<PublishersViewModel>(responseString);
-                    if (publisher != null)
-                    {
-                        updateModel = new PublisherUpdateModel
-                        {
-                            id = publisher.id,
-                            publisherName = publisher.publisherName,
-                            address = publisher.address,
-                            phoneNumber = publisher.phoneNumber,
-                            email = publisher.email,
-                            website = publisher.website,
-                            notes = publisher.notes
-                        };
-                    }
-                    else
-                    {
-                        updateModel = new PublisherUpdateModel
-                        {
-                            id = 0,
-                            publisherName = string.Empty,
-                            address = string.Empty,
-                            phoneNumber = string.Empty,
-                            email = string.Empty,
-                            website = string.Empty,
-                            notes = string.Empty
-                        };
-                    }
-                }
-                else
-                {
-                    var apiResponse = JsonSerializer.Deserialize<ApiResponseModel<object>>(responseString);
-                    ViewBag.Message = apiResponse?.message ?? "Editorial no encontrada.";
-                }
-            }
-            catch
+            var updateModel = new PublisherUpdateModel
             {
-                ViewBag.Message = "Error al obtener la editorial para editar.";
-            }
+                id = publisher.id,
+                publisherName = publisher.publisherName,
+                address = publisher.address,
+                phoneNumber = publisher.phoneNumber,
+                email = publisher.email,
+                website = publisher.website,
+                notes = publisher.notes
+            };
+
             return View(updateModel);
         }
 
@@ -181,21 +104,15 @@ namespace SIGEBI.Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            try
-            {
-                var response = await _httpClient.PutAsJsonAsync($"{_apiBaseUrl}/{model.id}", model);
-                var responseString = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<ApiResponseModel<PublishersViewModel>>(responseString);
+            var response = await _publishersService.UpdateAsync(model);
 
-                if (response.IsSuccessStatusCode && apiResponse?.success == true)
-                    return RedirectToAction(nameof(Index));
-
-                ViewBag.Message = apiResponse?.message ?? "Error al actualizar la editorial.";
-            }
-            catch
+            if (response?.success == true)
             {
-                ViewBag.Message = "Error al actualizar la editorial.";
+                _notificationService.Success("Editorial actualizada correctamente.");
+                return RedirectToAction(nameof(Index));
             }
+
+            _notificationService.Error(response?.message ?? "Error al actualizar la editorial.");
             return View(model);
         }
     }

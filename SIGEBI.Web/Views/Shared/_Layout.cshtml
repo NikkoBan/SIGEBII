@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using SIGEBI.Web.Models
+@using System.Text.Json
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -30,6 +32,32 @@
         </nav>
     </header>
     <div class="container">
+        @* Bloque de notificaciones *@
+        @{
+            var notifications = new List<NotificationMessage>();
+            if (TempData["Notifications"] != null)
+            {
+                notifications = JsonSerializer.Deserialize<List<NotificationMessage>>(TempData["Notifications"].ToString()!) ?? new();
+            }
+        }
+        @if (notifications.Any())
+        {
+            foreach (var notification in notifications)
+            {
+                var alertClass = notification.Type switch
+                {
+                    "success" => "alert-success",
+                    "error" => "alert-danger",
+                    "info" => "alert-info",
+                    "warning" => "alert-warning",
+                    _ => "alert-secondary"
+                };
+                <div class="alert @alertClass alert-dismissible fade show mt-2" role="alert">
+                    @notification.Message
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+            }
+        }
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
