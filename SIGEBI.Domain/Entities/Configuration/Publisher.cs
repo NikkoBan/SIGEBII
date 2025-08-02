@@ -7,7 +7,7 @@ namespace SIGEBI.Domain.Entities.Configuration
 {
     public class Publisher : BaseEntity<int>
     {
-        
+        [Column("PublisherId")]
         public override int Id { get; set; }
 
         public required string PublisherName { get; set; }

@@ -1,124 +1,69 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using SIGEBI.Application.Contracts.Service;
-using SIGEBI.Application.Dtos.AuthorDTO;
-using SIGEBI.Web0.Models;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
+
+using SIGEBI.Web0.Models.Author;
+using SIGEBI.Web0.Services.Author;
 
 namespace SIGEBI.Web0.Controllers
 {
+
     public class AuthorController: Controller
     {
-       
+        private readonly IAuthorWebService _authorWebService;
+
+        public AuthorController(IAuthorWebService authorWebService)
+        {
+            _authorWebService = authorWebService;
+        }
         // GET: AuthorControllerResponse
         public async Task<IActionResult> Index()
         {
 
-            GetAllAuthorResponse? getAllAuthorResponse = null;
-
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync("Author");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var options = new System.Text.Json.JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-                        getAllAuthorResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllAuthorResponse>(responseString, options)                            
-                        ?? new GetAllAuthorResponse
-                            {
-                                IsSucces = false,
-                                message = "Error al deserializar autores",
-                                data = new List<Authormodel>()
-                            };
-                    }
-                    else
-                    {
-                        getAllAuthorResponse = new GetAllAuthorResponse
-                        {
-                            IsSucces = false,
-                            message = "Error retrieving authors",
-                            data = new List<Authormodel>()
-                        };
-                    }
-                }
+                var authors = await _authorWebService.GetAllAuthorsAsync();
+                return View(authors);
             }
             catch (Exception ex)
             {
-                getAllAuthorResponse = new GetAllAuthorResponse
-                {
-                    IsSucces = false,
-                    message = ex.Message,
-                    data = new List<Authormodel>()
-                };
+                TempData["ErrorMessage"] = $"Ocurrió un error inesperado al cargar los autores: {ex.Message}";
+                return View(new List<Authormodel>());
             }
-
-            return View(getAllAuthorResponse.data);
         }
+            
+        
         // GET: AuthorControllerResponse/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            Authormodel? author = null;
-
             try
             {
-                using (var client = new HttpClient())
+                var author = await _authorWebService.GetAuthorByIdAsync(id);
+                if (author == null)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync($"/api/Author/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-
-                        var options = new System.Text.Json.JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-
-                        var getAuthorResponse = System.Text.Json.JsonSerializer.Deserialize<GetAuthorResponse>(responseString, options);
-                        author = getAuthorResponse?.data;
-                    }
-                    else
-                    {
-                        ViewBag.ErrorMessage = "No se encontró el autor.";
-                    }
+                    TempData["ErrorMessage"] = "Autor no encontrado.";
+                    return NotFound();
                 }
+                return View(author);
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = ex.Message;
+                TempData["ErrorMessage"] = $"Ocurrió un error inesperado al obtener el autor: {ex.Message}";
+                return View("Error");
             }
-
-            if (author == null)
-            {
-                return NotFound();
-            }
-
-            return View(author);
         }
-
         // GET: AuthorControllerResponse/Create
+
         [HttpGet]
-        public ActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
 
+       
         // POST: AuthorControllerResponse/Create
 
         [ValidateAntiForgeryToken]
 
         [HttpPost]
-
 
        
         public async Task<IActionResult> Create(CreateAuthorModel model)
@@ -127,132 +72,112 @@ namespace SIGEBI.Web0.Controllers
             {
                 return View(model);
             }
-
-            var dto = new CreateAuthorDTO
+            try
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                BirthDate = model.BirthDate,
-                Nationality = model.Nationality
-            };
-
-            using (var client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("https://localhost:7276/api/");
-                var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(dto), System.Text.Encoding.UTF8, "application/json");
-                var response = await client.PostAsync("Author", content);
-
-                if (response.IsSuccessStatusCode)
+                bool isSuccess = await _authorWebService.CreateAuthorAsync(model);
+                if (isSuccess)
                 {
+                    TempData["SuccessMessage"] = "Autor creado exitosamente.";
                     return RedirectToAction(nameof(Index));
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Error al crear el autor.");
-                    return View(model);
-                }
-            }
-        }
-        // GET: AuthorControllerResponse/Edit/5
-        public async Task<IActionResult>  Edit(int id)
-        {
-
-            Authormodel? author = null;
-
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync($"/api/Author/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-
-                        var options = new System.Text.Json.JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-
-                        var getAuthorResponse = System.Text.Json.JsonSerializer.Deserialize<GetAuthorResponse>(responseString, options);
-                        author = getAuthorResponse?.data;
-                    }
-                    else
-                    {
-                        ViewBag.ErrorMessage = "No se encontró el autor.";
-                    }
+                    ModelState.AddModelError(string.Empty, "No se pudo crear el autor. Por favor, intente de nuevo.");
                 }
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = ex.Message;
+                ModelState.AddModelError(string.Empty, $"Ocurrió un error inesperado al crear el autor: {ex.Message}");
             }
+            return View(model);
+        }
 
-            if (author == null)
+       
+
+        // GET: AuthorControllerResponse/Edit/5
+        public async Task<IActionResult>  Edit(int id)
+        {
+
+            try
             {
-                return NotFound();
+                var editModel = await _authorWebService.GetEditAuthorModelByIdAsync(id);
+                if (editModel == null)
+                {
+                    TempData["ErrorMessage"] = "Autor no encontrado para edición.";
+                    return NotFound();
+                }
+                return View(editModel);
             }
-
-            return View(author);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error inesperado al cargar el autor para edición: {ex.Message}";
+                return View("Error");
+            }
         }
 
 
         // POST: AuthorControllerResponse/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Authormodel model)
+        public async Task<IActionResult> Edit(int id, EditAuthorModel model)
         {
+            if (id != model.AuthorId)
+            {
+                TempData["ErrorMessage"] = "ID de autor no coincide.";
+                return NotFound();
+            }
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             try
             {
-                using (var client = new HttpClient())
+                bool isSuccess = await _authorWebService.UpdateAuthorAsync(id, model);
+                if (isSuccess)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7276/");
-
-                    // Enviar la solicitud PUT con el id correcto
-                    var response = await client.PutAsJsonAsync($"api/Author/{id}", model);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-
-                        // Opciones para ignorar mayúsculas y minúsculas
-                        var options = new System.Text.Json.JsonSerializerOptions
-                        {
-                            PropertyNameCaseInsensitive = true
-                        };
-
-                        var authorEditResponse = System.Text.Json.JsonSerializer.Deserialize<AuthorEditResponse>(responseString, options);
-
-                        if (authorEditResponse != null && authorEditResponse.isSucces)
-                        {
-                            TempData["SuccessMessage"] = "Author updated successfully.";
-                        }
-                        else
-                        {
-                            TempData["ErrorMessage"] = authorEditResponse?.message ?? "Something went wrong.";
-                        }
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = "Failed to update the author.";
-                    }
-
+                    TempData["SuccessMessage"] = "Autor actualizado exitosamente.";
                     return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "No se pudo actualizar el autor.");
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error: {ex.Message}";
-                return View(model); // Así puedes devolver el modelo con errores si los hay
+                ModelState.AddModelError(string.Empty, $"Ocurrió un error inesperado al actualizar el autor: {ex.Message}");
+            }
+            return View(model);
+        }
+
+        // GET: AuthorController/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var author = await _authorWebService.GetAuthorByIdAsync(id);
+                if (author == null)
+                {
+                    TempData["ErrorMessage"] = "Autor no encontrado para eliminar.";
+                    return NotFound();
+                }
+                return View(author);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error inesperado al cargar el autor para eliminar: {ex.Message}";
+                return View("Error");
             }
         }
 
+
+
+
         // GET: AuthorControllerResponse/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
 
         // POST: AuthorControllerResponse/Delete/5
         [HttpPost]

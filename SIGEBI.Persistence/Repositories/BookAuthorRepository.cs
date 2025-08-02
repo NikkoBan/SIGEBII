@@ -1,24 +1,47 @@
-﻿
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
-
 using SIGEBI.Persistence.Base;
-
 using SIGEBI.Domain.IRepository;
 using SIGEBI.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-
-
-
+using SIGEBI.Application.Dtos.BookAuthorDTO;
 
 namespace SIGEBI.Persistence.Repositories
 {
     public class BookAuthorRepository : BaseRepositoryEf<BookAuthor>, IBookAuthorRepository
     {
+        private readonly SIGEBIContext _context;
+
         public BookAuthorRepository(SIGEBIContext context, ILogger<BookAuthorRepository> logger)
             : base(context, logger)
         {
+            _context = context;
+        }
+
+        public async Task<OperationResult> GetAllBookAuthorsAsync()
+        {
+            try
+            {
+                var bookAuthors = await _context.BookAuthor
+                    .Include(ba => ba.Book)
+                    .Include(ba => ba.Author)
+                    .Select(ba => new BookAuthorDTO
+                    {
+                        BookId = ba.BookId,
+                        AuthorId = ba.AuthorId,
+                        BookTitle = ba.Book != null ? ba.Book.Title : null,
+                        AuthorName = ba.Author != null ? $"{ba.Author.FirstName} {ba.Author.LastName}" : null
+                    })
+                    .ToListAsync();
+
+                return new OperationResult { Success = true, Data = bookAuthors };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener todas las relaciones libro-autor.");
+                return new OperationResult { Success = false, Message = ex.Message };
+            }
         }
 
         public async Task<bool> CheckDuplicateBookAuthorCombinationAsync(int bookId, int authorId)
@@ -50,16 +73,23 @@ namespace SIGEBI.Persistence.Repositories
         {
             try
             {
-                var authors = await _dbSet
+                var bookAuthors = await _dbSet
                     .Where(ba => ba.BookId == bookId)
-                    .Select(ba => ba.Author)  // propiedad Author, no Authors
+                    .Include(ba => ba.Author)  
+                    .Include(ba => ba.Book)   
+                    .Select(ba => new BookAuthorDTO
+                    {
+                        BookId = ba.BookId,
+                        AuthorId = ba.AuthorId,
+                        BookTitle = ba.Book.Title,
+                        AuthorName = $"{ba.Author.FirstName} {ba.Author.LastName}" 
+                    })
                     .ToListAsync();
 
-                return new OperationResult { Success = true, Data = authors };
+                return new OperationResult { Success = true, Data = bookAuthors };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error obteniendo autores para el libro {bookId}.");
                 return new OperationResult { Success = false, Message = ex.Message };
             }
         }
@@ -70,7 +100,15 @@ namespace SIGEBI.Persistence.Repositories
             {
                 var books = await _dbSet
                     .Where(ba => ba.AuthorId == authorId)
-                    .Select(ba => ba.Book) // propiedad Book, no Books
+                    .Include(ba => ba.Book)
+                    .Include(ba => ba.Author)
+                    .Select(ba => new BookAuthorDTO
+                    {
+                        BookId = ba.BookId,
+                        AuthorId = ba.AuthorId,
+                        BookTitle = ba.Book != null ? ba.Book.Title : null,
+                        AuthorName = $"{ba.Author.FirstName} {ba.Author.LastName}"
+                    })
                     .ToListAsync();
 
                 return new OperationResult { Success = true, Data = books };
@@ -94,8 +132,6 @@ namespace SIGEBI.Persistence.Repositories
                 {
                     BookId = bookId,
                     AuthorId = authorId,
-                  
-
                 };
 
                 await _dbSet.AddAsync(entity);
@@ -107,6 +143,22 @@ namespace SIGEBI.Persistence.Repositories
             {
                 _logger.LogError(ex, $"Error creando relación libro {bookId} - autor {authorId}.");
                 return new OperationResult { Success = false, Message = ex.Message };
+            }
+        }
+
+        public async Task<BookAuthor?> GetByCompositeKeyAsync(int bookId, int authorId)
+        {
+            try
+            {
+                return await _context.BookAuthor
+                    .Include(ba => ba.Book)
+                    .Include(ba => ba.Author)
+                    .FirstOrDefaultAsync(ba => ba.BookId == bookId && ba.AuthorId == authorId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error obteniendo relación libro {bookId} - autor {authorId}.");
+                return null;
             }
         }
     }

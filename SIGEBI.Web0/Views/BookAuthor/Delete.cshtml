@@ -1,0 +1,88 @@
+﻿@model SIGEBI.Web0.Models.BookAuthor.DeleteBookAuthorModel
+
+@{
+    ViewData["Title"] = "Eliminar Relación Libro-Autor";
+}
+
+<style>
+
+        .btn-marron-oscuro {
+                background-color: #6D4C41;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+        .btn-marron-oscuro:hover {
+                background-color: #5D4037;
+                color: white;
+
+    }
+
+
+
+
+        .btn-esmeralda {
+                background-color: #04928b;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+        .btn-esmeralda:hover {
+                background-color: #036862;
+                color: white;
+
+    }
+</style>
+
+<h1>Eliminar Relación</h1>
+
+<h3>¿Estás seguro de que quieres eliminar esta relación?</h3>
+<div>
+    <h4>Relación Libro-Autor</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.BookTitle)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.BookTitle)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.AuthorName)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.AuthorName)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.BookId)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.BookId)
+        </dd>
+        <dt class="col-sm-4">
+            @Html.DisplayNameFor(model => model.AuthorId)
+        </dt>
+        <dd class="col-sm-8">
+            @Html.DisplayFor(model => model.AuthorId)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="BookId" />
+        <input type="hidden" asp-for="AuthorId" />
+        <div class="d-flex justify-content-start mt-4">
+            <input type="submit" value="Eliminar" class="btn btn-marron-oscuro me-2" />
+            <a asp-action="Index" class="btn btn-esmeralda">Volver a la Lista</a>
+        </div>
+    </form>
+</div>

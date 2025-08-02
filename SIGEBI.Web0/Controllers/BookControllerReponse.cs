@@ -1,214 +1,194 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Application.Dtos.BooksDtos;
-using SIGEBI.Web0.Models;
-using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
+using SIGEBI.Web0.Models.Book;
+using SIGEBI.Web0.Services.Book;
 
 namespace SIGEBI.Web0.Controllers
 {
     public class BookController : Controller
 
     {
-        private readonly string _apiBase = "https://localhost:7276/api/";
+        private readonly IBookWebService _bookService;
+        private readonly ILogger<BookController> _logger;
+
+        public BookController(IBookWebService bookService, ILogger<BookController> logger)
+        {
+            _bookService = bookService;
+            _logger = logger;
+        }
+
+
         // GET: BookControllerReponse
+
+        // GET: /Book/Index
         public async Task<IActionResult> Index()
         {
-            GetAllBookResponse? getAllBookResponse = null;
             try
             {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync("Book");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        getAllBookResponse = System.Text.Json.JsonSerializer.Deserialize<GetAllBookResponse>(responseString);
-                    }
-                    else
-                    {
-                        getAllBookResponse = new GetAllBookResponse
-                        {
-                            IsSuccess = false,
-                            message = "Error retrieving books",
-                            data = new List<BookModel>()
-                        };
-                    }
-                }
+                var books = await _bookService.GetAllBooksAsync();
+                return View(books);
             }
             catch (Exception ex)
             {
-                getAllBookResponse = new GetAllBookResponse
-                {
-                    IsSuccess = false,
-                    message = ex.Message,
-                    data = new List<BookModel>()
-                };
+                _logger.LogError(ex, "Error al obtener la lista de libros.");
+                TempData["ErrorMessage"] = $"Ocurrió un error al cargar los libros: {ex.Message}";
+                return View(new List<BookModel>());
             }
-
-            return View(getAllBookResponse?.data ?? new List<BookModel>());
         }
 
-        // GET: BookControllerReponse/Details/5
+        // GET: /Book/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            BookModel? book = null;
-
+            if (id <= 0)
+            {
+                TempData["ErrorMessage"] = "ID de libro no válido.";
+                return RedirectToAction(nameof(Index));
+            }
             try
             {
-                using (var client = new HttpClient())
+                var book = await _bookService.GetBookDetailsAsync(id);
+                if (book == null)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync($"/api/Book/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-
-                        var getBookResponse = System.Text.Json.JsonSerializer.Deserialize<GetBookResponse>(responseString);
-                        book = getBookResponse?.data;
-                    }
-                    else
-                    {
-                        ViewBag.ErrorMessage = "No se encontró el libro.";
-                    }
+                    _logger.LogWarning("Libro con ID {BookId} no encontrado para detalles.", id);
+                    TempData["ErrorMessage"] = $"No se encontró el libro con ID {id}.";
+                    return NotFound();
                 }
+                return View(book);
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = ex.Message;
+                _logger.LogError(ex, "Error al obtener detalles del libro con ID {BookId}.", id);
+                TempData["ErrorMessage"] = $"Ocurrió un error al cargar los detalles del libro: {ex.Message}";
+                return RedirectToAction(nameof(Index));
             }
-
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
         }
-
-        // GET: BookControllerReponse/Create
-        public ActionResult Create()
+        
+        // GET: /Book/Create
+        public async Task<IActionResult> Create()
         {
+            await _bookService.PopulateDropdownsForBookForm(ViewBag);
             return View();
         }
 
-        // POST: BookControllerReponse/Create
+        // POST: /Book/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateBookModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);  
-            }
-
-            try
-            {
-                using var client = new HttpClient();
-                client.BaseAddress = new Uri("https://localhost:7276/api/");
-
-                var response = await client.PostAsJsonAsync("Book", model);  
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                var apiResponse = JsonSerializer.Deserialize<AuthorCreateResponse>(responseString);
-
-               
-                if (response.IsSuccessStatusCode && apiResponse?.IsSucces == true)
-                {
-                    return RedirectToAction(nameof(Index));
-                }
-
-                ViewBag.Message = apiResponse?.message ?? "Error al crear el libro.";
-            }
-            catch
-            {
-                ViewBag.Message = "Error al crear el libro.";
-            }
-
-            return View(model);  
-        }
-
-        // GET: BookControllerReponse/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            BookModel? book = null;
-
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://localhost:7276/api/");
-                    var response = await client.GetAsync($"Book/{id}");
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var getBookResponse = System.Text.Json.JsonSerializer.Deserialize<GetBookResponse>(responseString);
-                        book = getBookResponse?.data;
-                    }
-                    else
-                    {
-                        ViewBag.ErrorMessage = "No se encontró el libro.";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ViewBag.ErrorMessage = ex.Message;
-            }
-
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return View(book);
-        }
-
-
-        // POST: BookControllerReponse/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, BookModel model)
-        {
-            try
-            {
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = new Uri("https://localhost:7276/");
-
-                    var response = await client.PutAsJsonAsync($"api/Book/{id}", model);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseString = await response.Content.ReadAsStringAsync();
-                        var bookEditResponse = System.Text.Json.JsonSerializer.Deserialize<AuthorEditResponse>(responseString);
-
-                        if (bookEditResponse != null && bookEditResponse.isSucces)
-                        {
-                            TempData["SuccessMessage"] = "Book updated successfully.";
-                        }
-                        else
-                        {
-                            TempData["ErrorMessage"] = bookEditResponse?.message ?? "Something went wrong.";
-                        }
-                    }
-                    else
-                    {
-                        TempData["ErrorMessage"] = "Failed to update the book.";
-                    }
-
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Error: {ex.Message}";
+                await _bookService.PopulateDropdownsForBookForm(ViewBag);
                 return View(model);
             }
+
+            try
+            {
+                // Le pide al servicio que cree el libro
+                bool isSuccess = await _bookService.CreateBookAsync(model);
+                if (isSuccess)
+                {
+                    TempData["SuccessMessage"] = "Libro creado exitosamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "No se pudo crear el libro. Por favor, intente de nuevo.");
+                }
+            }
+            catch (ApplicationException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, $"Ocurrió un error inesperado al crear el libro: {ex.Message}");
+            }
+
+            await _bookService.PopulateDropdownsForBookForm(ViewBag);
+            return View(model);
         }
+
+        // GET: /Book/Edit/5
+
+        // GET: /Book/Edit/5
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            EditBookModel? editModel = null;
+            try
+            {
+                // Le pide al servicio que prepare el modelo para edición
+                editModel = await _bookService.GetEditBookModelByIdAsync(id);
+                if (editModel == null)
+                {
+                    TempData["ErrorMessage"] = "Libro no encontrado para edición.";
+                    return NotFound();
+                }
+                await _bookService.PopulateDropdownsForBookForm(ViewBag);
+            }
+            catch (ApplicationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Ocurrió un error inesperado al cargar el libro para edición: {ex.Message}";
+                return View("Error");
+            }
+            return View(editModel);
+        }
+        
+
+
+        
+        // POST:/Book/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, EditBookModel model)
+        {
+                if (id != model.BookId)
+                {
+                    TempData["ErrorMessage"] = "ID de libro no coincide.";
+                    return NotFound();
+                }
+
+                if (!ModelState.IsValid)
+                {
+                    await _bookService.PopulateDropdownsForBookForm(ViewBag);
+                    return View(model);
+                }
+
+                try
+                {
+                    bool isSuccess = await _bookService.UpdateBookAsync(id, model);
+                    if (isSuccess)
+                    {
+                        TempData["SuccessMessage"] = "Libro actualizado exitosamente.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "No se pudo actualizar el libro.");
+                    }
+                }
+                catch (ApplicationException ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Ocurrió un error inesperado al actualizar el libro: {ex.Message}");
+                }
+
+                await _bookService.PopulateDropdownsForBookForm(ViewBag);
+                return View(model);
+         }
+
+
+
 
         // GET: BookControllerReponse/Delete/5
         public ActionResult Delete(int id)
@@ -230,5 +210,11 @@ namespace SIGEBI.Web0.Controllers
                 return View();
             }
         }
+
+      
+
     }
+
 }
+    
+

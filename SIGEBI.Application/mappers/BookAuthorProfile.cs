@@ -13,7 +13,11 @@ namespace SIGEBI.Application.mappers
             return new BookAuthorDTO
             {
                 BookId = entity.BookId,
-                AuthorId = entity.AuthorId
+                AuthorId = entity.AuthorId,
+                BookTitle = entity.Book?.Title,
+                AuthorName = entity.Author != null
+            ? $"{entity.Author.FirstName} {entity.Author.LastName}"
+            : null
             };
         }
 

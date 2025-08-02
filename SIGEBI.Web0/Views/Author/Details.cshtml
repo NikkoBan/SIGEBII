@@ -1,29 +1,88 @@
-﻿@model SIGEBI.Web0.Models.Authormodel
+﻿@using SIGEBI.Web0.Models.Author
+@model Authormodel
+
+<style>
+    /* Estilos personalizados para esta vista */
+    .btn-esmeralda {
+        background-color: #04928b; /* Verde esmeralda */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-esmeralda:hover {
+            background-color: #036862; /* Verde esmeralda más oscuro */
+            color: white;
+        }
+
+    .btn-pastel {
+        background-color: #b0e0e6; /* Verde pastel */
+        color: #2c3e50; /* Texto oscuro para contraste */
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-pastel:hover {
+            background-color: #87ceeb; /* Verde pastel más oscuro */
+            color: #2c3e50;
+        }
+
+    .custom-title {
+        color: #04928b; /* Usa el mismo verde esmeralda para el título */
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    .details-container {
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa; /* Fondo muy claro para la sección de detalles */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .dl-horizontal dt {
+        float: left;
+        clear: left;
+        width: 150px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 170px;
+    }
+</style>
 
 <h1>Details</h1>
 
-<div>
+<div class="details-container">
     <h4>Authormodel</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">Author ID</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.AuthorId)</dd>
+        <dt class="col-sm-3">Author ID</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.AuthorId)</dd>
 
-        <dt class="col-sm-2">First Name</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.FirstName)</dd>
+        <dt class="col-sm-3">First Name</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.FirstName)</dd>
 
-        <dt class="col-sm-2">Last Name</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.LastName )</dd>
+        <dt class="col-sm-3">Last Name</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.LastName)</dd>
 
-        <dt class="col-sm-2">Birth Date</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.BirthDate)</dd>
+        <dt class="col-sm-3">Birth Date</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.BirthDate)</dd>
 
-        <dt class="col-sm-2">Nationality</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Nationality)</dd>
+        <dt class="col-sm-3">Nationality</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Nationality)</dd>
     </dl>
 </div>
 
-<div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.AuthorId }) |
-    <a asp-action="Index">Back to List</a>
+<div class="d-flex justify-content-start gap-2 mt-4">
+    <a asp-action="Edit" asp-route-id="@Model.AuthorId" class="btn btn-esmeralda">Edit</a>
+    <a asp-action="Index" class="btn btn-pastel">Back to List</a>
 </div>

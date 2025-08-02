@@ -13,5 +13,8 @@ namespace SIGEBI.Domain.IRepository
         Task<OperationResult> SearchBooksAsync(string searchTerm);
         Task<OperationResult> GetAvailableBooksAsync();
         Task<bool> CheckDuplicateISBNAsync(string isbn, int? excludeBookId = null);
+         Task<OperationResult> GetAllBooksWithRelationships();
+        Task<OperationResult> GetBookWithRelationshipsByIdAsync(int id);
+
     }
 }

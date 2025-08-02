@@ -1,102 +1,160 @@
-﻿@model SIGEBI.Web0.Models.BookModel
+﻿@model SIGEBI.Web0.Models.Book.BookModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<style>
+    /* Estilos personalizados para esta vista */
+    .btn-marron-oscuro {
+        background-color: #6D4C41; /* Marrón oscuro (chocolate) */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
 
-<div>
+        .btn-marron-oscuro:hover {
+            background-color: #5D4037; /* Marrón más oscuro al pasar el ratón */
+            color: white;
+        }
+
+    .btn-marron-claro {
+        background-color: #D7CCC8; /* Marrón claro (pastel) */
+        color: #3e2723; /* Texto oscuro para contraste */
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-marron-claro:hover {
+            background-color: #BCAAA4; /* Marrón claro más oscuro al pasar el ratón */
+            color: #3e2723;
+        }
+
+    .custom-title {
+        color: #6D4C41; /* Usa el mismo marrón oscuro para el título */
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    .details-container {
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa; /* Fondo muy claro para la sección de detalles */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .dl-horizontal dt {
+        float: left;
+        clear: left;
+        width: 150px;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 170px;
+    }
+</style>
+
+<h1 class="custom-title">Details</h1>
+
+<div class="details-container">
     <h4>BookModel</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.bookId)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.BookId)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.bookId)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.BookId)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.title)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Title)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.title)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Title)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.isbn)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.ISBN)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.isbn)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.ISBN)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.publicationDate)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.PublicationDate)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.publicationDate)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.PublicationDate)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.categoryId)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CategoryId)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.categoryId)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CategoryId)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.categoryName)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.CategoryName)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.categoryName)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.CategoryName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.publisherId)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.PublisherId)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.publisherId)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.PublisherId)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.publisherName)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.PublisherName)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.publisherName)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.PublisherName)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.language)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Language)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.language)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Language)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.summary)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.Summary)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.summary)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.Summary)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.totalCopies)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.TotalCopies)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.totalCopies)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.TotalCopies)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.availableCopies)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.AvailableCopies)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.availableCopies)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.AvailableCopies)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.generalStatus)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.GeneralStatus)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.generalStatus)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.GeneralStatus)
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.isAvailable)
+        <dt class="col-sm-3">
+            @Html.DisplayNameFor(model => model.IsAvailable)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.isAvailable)
+        <dd class="col-sm-9">
+            @Html.DisplayFor(model => model.IsAvailable)
         </dd>
     </dl>
 </div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.bookId }) |
-    <a asp-action="Index">Back to List</a>
+<div class="d-flex justify-content-start gap-2 mt-4">
+    @Html.ActionLink("Edit", "Edit", new { id = Model.BookId }, new { @class = "btn btn-marron-oscuro" })
+    <a asp-action="Index" class="btn btn-marron-claro">Back to List</a>
 </div>

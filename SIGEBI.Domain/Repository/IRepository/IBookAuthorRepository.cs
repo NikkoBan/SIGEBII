@@ -10,6 +10,10 @@ namespace SIGEBI.Domain.IRepository
         Task<OperationResult> GetAuthorsByBookAsync(int bookId);
         Task<OperationResult> GetBooksByAuthorAsync(int authorId);
         Task<OperationResult> AddBookAuthorAsync(int bookId, int authorId);
+        Task<BookAuthor?> GetByCompositeKeyAsync(int bookId, int authorId);
+        Task<OperationResult> GetAllBookAuthorsAsync();
+
+
 
     }
 }

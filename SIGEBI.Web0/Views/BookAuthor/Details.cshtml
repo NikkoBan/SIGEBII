@@ -1,0 +1,55 @@
+﻿@model SIGEBI.Web0.Models.BookAuthor.BookAuthorModel
+
+@{
+    ViewData["Title"] = "Detalles de la Relación Libro-Autor";
+}
+
+<style>
+
+        .btn-esmeralda {
+                background-color: #04928b;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+        .btn-esmeralda:hover {
+                background-color: #036862;
+                color: white;
+
+    }
+
+        .custom-title {
+                color: #6D4C41;
+                font-weight: 300;
+                margin-bottom: 20px;
+
+    }
+</style>
+
+<h1>Detalles de la Relación Libro-Autor</h1>
+
+<div>
+    <h4>BookAuthorModel</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.BookTitle)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.BookTitle)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.AuthorName)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.AuthorName)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.BookId)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.BookId)</dd>
+
+        <dt class="col-sm-2">@Html.DisplayNameFor(model => model.AuthorId)</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.AuthorId)</dd>
+    </dl>
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-esmeralda">Volver</a>
+    </div>
+</div>

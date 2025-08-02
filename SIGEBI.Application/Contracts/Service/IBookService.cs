@@ -11,5 +11,8 @@ namespace SIGEBI.Application.Contracts.Service
         Task<OperationResult> GetBooksByPublisherAsync(int publisherId);
         Task<OperationResult> SearchBooksAsync(string searchTerm);
         Task<OperationResult> GetAvailableBooksAsync();
+        Task<OperationResult> GetAllBooksWithRelationships();
+        Task<OperationResult> GetBookWithRelationshipsByIdAsync(int id);
+
     }
 }

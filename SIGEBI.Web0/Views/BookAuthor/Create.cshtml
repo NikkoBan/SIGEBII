@@ -1,0 +1,105 @@
+﻿@model SIGEBI.Web0.Models.BookAuthor.CreateBookAuthorModel
+
+@{
+    ViewData["Title"] = "Crear Relación Libro-Autor";
+}
+
+<style>
+
+        .btn-marron-oscuro {
+                background-color: #6D4C41;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+        .btn-marron-oscuro:hover {
+                background-color: #5D4037;
+                color: white;
+
+    }
+
+
+        .btn-esmeralda {
+                background-color: #04928b;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+        .btn-esmeralda:hover {
+                background-color: #036862;
+                color: white;
+
+    }
+
+        .custom-title {
+                color: #6D4C41;
+                font-weight: 300;
+                margin-bottom: 20px;
+
+    }
+
+        .form-container {
+                padding: 20px;
+                border-radius: 8px;
+                background-color: #f8f9fa;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+
+    }
+</style>
+
+<h1 class="custom-title">Crear Nueva Relación</h1>
+
+<h4>Relación Libro-Autor</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-container">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="BookId" class="control-label"></label>
+                    <select asp-for="BookId" class="form-control" asp-items="ViewBag.BookList">
+                        <option value="">-- Seleccione un Libro --</option>
+                    </select>
+                    <span asp-validation-for="BookId" class="text-danger"></span>
+                    @if (TempData["WarningMessageBooks"] != null)
+                    {
+                        <small class="text-warning">@TempData["WarningMessageBooks"]</small>
+                    }
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="AuthorId" class="control-label"></label>
+                    <select asp-for="AuthorId" class="form-control" asp-items="ViewBag.AuthorList">
+                        <option value="">-- Seleccione un Autor --</option>
+                    </select>
+                    <span asp-validation-for="AuthorId" class="text-danger"></span>
+                    @if (TempData["WarningMessageAuthors"] != null)
+                    {
+                        <small class="text-warning">@TempData["WarningMessageAuthors"]</small>
+                    }
+                </div>
+                <div class="d-flex justify-content-between mt-4">
+                    <input type="submit" value="Crear" class="btn btn-marron-oscuro" />
+                    <a asp-action="Index" class="btn btn-esmeralda">Volver a la Lista</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

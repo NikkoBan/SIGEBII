@@ -1,0 +1,101 @@
+﻿@model IEnumerable<SIGEBI.Web0.Models.BookAuthor.BookAuthorModel>
+
+@{
+    ViewData["Title"] = "Relaciones Libro-Autor";
+}
+
+<style>
+        .btn-marron-oscuro {
+                background-color: #6D4C41;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 5px;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+
+    }
+
+            .btn-marron-oscuro:hover {
+                    background-color: #5D4037;
+                    color: white;
+
+        }
+
+        .btn-marron-oscuro-sm {
+                background-color: #6D4C41;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 0.875rem;
+                transition: background-color 0.3s ease;
+
+    }
+
+            .btn-marron-oscuro-sm:hover {
+                    background-color: #5D4037;
+                    color: white;
+
+        }
+
+        .btn-esmeralda-sm {
+                background-color: #04928b;
+                color: white;
+                border: none;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-size: 0.875rem;
+                transition: background-color 0.3s ease;
+
+    }
+
+            .btn-esmeralda-sm:hover {
+                    background-color: #036862;
+                    color: white;
+
+        }
+</style>
+
+<h1>Relaciones Libro-Autor</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-marron-oscuro">Crear Nueva Relación</a>
+</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3" role="alert">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.BookTitle)</th>
+            <th>@Html.DisplayNameFor(model => model.AuthorName)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.BookTitle)</td>
+                <td>@Html.DisplayFor(modelItem => item.AuthorName)</td>
+                <td>
+                    <a asp-action="Details" asp-route-bookId="@item.BookId" asp-route-authorId="@item.AuthorId" class="btn btn-esmeralda-sm">Detalles</a>
+                    <a asp-action="Delete" asp-route-bookId="@item.BookId" asp-route-authorId="@item.AuthorId" class="btn btn-marron-oscuro-sm ms-2">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

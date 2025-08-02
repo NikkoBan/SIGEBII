@@ -10,5 +10,10 @@ namespace SIGEBI.Application.Contracts.Service
         Task<OperationResult> GetAuthorsByBookAsync(int bookId);
         Task<OperationResult> GetBooksByAuthorAsync(int authorId);
         Task<OperationResult> AddBookAuthorAsync(int bookId, int authorId);
+        Task<OperationResult> GetByCompositeKeyAsync(int bookId, int authorId);
+
+        Task<OperationResult> GetAllBookAuthorsAsync();
+
+
     }
 }

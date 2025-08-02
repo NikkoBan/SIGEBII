@@ -23,14 +23,15 @@ namespace SIGEBI.api.Controllers
         {
             var result = await _authorBookService.GetAllAsync();
             return result.Success ? Ok(result) : BadRequest(result.Message);
+            return result.Success ? Ok(result) : BadRequest(result.Message);
         }
 
         // GET: api/AuthorBook/{bookId}/{authorId}
         [HttpGet("{bookId:int}/{authorId:int}")]
         public async Task<IActionResult> GetByIds(int bookId, int authorId)
         {
-            var result = await _authorBookService.CheckDuplicateBookAuthorCombinationAsync(bookId, authorId);
-            return Ok(result); // este método devuelve true/false
+            var result = await _authorBookService.GetByCompositeKeyAsync(bookId, authorId);
+            return result.Success && result.Data != null ? Ok(result) : NotFound(result);
         }
 
         // POST: api/AuthorBook
@@ -62,7 +63,13 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> GetAuthorsByBook(int bookId)
         {
             var result = await _authorBookService.GetAuthorsByBookAsync(bookId);
-            return result.Success ? Ok(result) : NotFound(result);
+            return result.Success && result.Data != null ? Ok(result) : NotFound(result);
+        }
+        [HttpGet("with-details")]
+        public async Task<IActionResult> GetWithDetails()
+        {
+            var result = await _authorBookService.GetAllBookAuthorsAsync();
+            return result.Success ? Ok(result) : BadRequest(result.Message);
         }
     }
 }

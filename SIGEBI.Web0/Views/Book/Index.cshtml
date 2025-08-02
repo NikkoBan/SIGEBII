@@ -1,113 +1,135 @@
-﻿@model IEnumerable<SIGEBI.Web0.Models.BookModel>
+﻿@model IEnumerable<SIGEBI.Web0.Models.Book.BookModel>
 
 @{
-    ViewData["Title"] = "Books";
+    ViewData["Title"] = "Index";
 }
 
-<h1>Book</h1>
+<style>
+    /* Estilos personalizados para esta vista */
+    .btn-marron-oscuro {
+        background-color: #6D4C41; /* Marrón oscuro (chocolate) */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-marron-oscuro:hover {
+            background-color: #5D4037; /* Marrón más oscuro al pasar el ratón */
+            color: white;
+        }
+
+    .btn-marron-claro {
+        background-color: #D7CCC8; /* Marrón claro (pastel) */
+        color: #3e2723; /* Texto oscuro para contraste */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-marron-claro:hover {
+            background-color: #BCAAA4; /* Marrón claro más oscuro al pasar el ratón */
+            color: #3e2723;
+        }
+
+    .btn-danger-light {
+        background-color: #ffcccc; /* Rojo pastel */
+        color: #cc0000; /* Rojo oscuro para el texto */
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-danger-light:hover {
+            background-color: #ff9999; /* Rojo un poco más oscuro al pasar el ratón */
+        }
+
+    .custom-title {
+        color: #6D4C41; /* Usa el mismo marrón oscuro para el título */
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden; /* Para que los bordes redondeados se vean bien */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+        .table-custom th, .table-custom td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .table-custom thead th {
+            background-color: #6D4C41; /* Marrón oscuro para la cabecera */
+            color: white;
+            font-weight: normal;
+            text-align: left;
+        }
+
+        .table-custom tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Color de fondo para filas pares */
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: #e9ecef; /* Color de fondo al pasar el ratón */
+        }
+</style>
+
+<h1 class="custom-title">Index</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Crear Nuevo Libro</a>
-
+    <a href="/Book/Create" class="btn-marron-oscuro">Create New</a>
 </p>
-<table class="table">
+<table class="table table-custom">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.bookId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.isbn)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.publicationDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.categoryId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.categoryName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.publisherId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.publisherName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.language)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.summary)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.totalCopies)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.availableCopies)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.generalStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.isAvailable)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.BookId)</th>
+            <th>@Html.DisplayNameFor(model => model.Title)</th>
+            <th>@Html.DisplayNameFor(model => model.ISBN)</th>
+            <th>@Html.DisplayNameFor(model => model.PublicationDate)</th>
+            <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+            <th>@Html.DisplayNameFor(model => model.PublisherName)</th>
+            <th>@Html.DisplayNameFor(model => model.Language)</th>
+            <th>@Html.DisplayNameFor(model => model.TotalCopies)</th>
+            <th>@Html.DisplayNameFor(model => model.AvailableCopies)</th>
+            <th>@Html.DisplayNameFor(model => model.GeneralStatus)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.bookId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isbn)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.publicationDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.categoryId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.categoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.publisherId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.publisherName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.language)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.summary)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.totalCopies)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.availableCopies)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.generalStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.isAvailable)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.bookId}) |
-                    @Html.ActionLink("Details", "Details", new { id = item.bookId }) |
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.BookId)</td>
+                <td>@Html.DisplayFor(modelItem => item.Title)</td>
+                <td>@Html.DisplayFor(modelItem => item.ISBN)</td>
+                <td>@Html.DisplayFor(modelItem => item.PublicationDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                <td>@Html.DisplayFor(modelItem => item.PublisherName)</td>
+                <td>@Html.DisplayFor(modelItem => item.Language)</td>
+                <td>@Html.DisplayFor(modelItem => item.TotalCopies)</td>
+                <td>@Html.DisplayFor(modelItem => item.AvailableCopies)</td>
+                <td>@Html.DisplayFor(modelItem => item.GeneralStatus)</td>
+                <td class="d-flex gap-2">
+                    @Html.ActionLink("Edit", "Edit", new { id = item.BookId }, new { @class = "btn-marron-claro" })
+                    @Html.ActionLink("Details", "Details", new { id = item.BookId }, new { @class = "btn-marron-claro" })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,8 +1,4 @@
-﻿
-
-
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Contracts.Service;
 using SIGEBI.Application.Dtos.BooksDtos;
 using SIGEBI.Domain.Base;
@@ -14,6 +10,7 @@ namespace SIGEBI.Application.Services
     public class BookService : BaseService<BookDTO, CreateBookDTO, UpdateBookDto, Books>, IBookService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly ILogger<BookService> _logger;
 
         public BookService(
             IBookRepository bookRepository,
@@ -21,6 +18,7 @@ namespace SIGEBI.Application.Services
             : base(bookRepository, logger)
         {
             _bookRepository = bookRepository;
+            _logger = logger;
         }
 
         public async Task<OperationResult> CheckDuplicateBookTitleAsync(string title, int? excludeBookId = null)
@@ -36,7 +34,6 @@ namespace SIGEBI.Application.Services
                 return OperationResult.FailureResult($"Error interno: {ex.Message}");
             }
         }
-        
 
         public async Task<OperationResult> CheckDuplicateISBNAsync(string isbn, int? excludeBookId = null)
         {
@@ -103,9 +100,9 @@ namespace SIGEBI.Application.Services
                 return OperationResult.FailureResult(ex.Message);
             }
         }
+
         public override async Task<OperationResult> CreateAsync(CreateBookDTO dto)
         {
-
             try
             {
                 var entity = MapToEntity(dto);
@@ -126,9 +123,6 @@ namespace SIGEBI.Application.Services
             }
         }
 
-
-
-
         protected override BookDTO MapToDto(Books entity)
         {
             return new BookDTO
@@ -142,12 +136,11 @@ namespace SIGEBI.Application.Services
                 TotalCopies = entity.TotalCopies,
                 AvailableCopies = entity.AvailableCopies,
                 GeneralStatus = entity.GeneralStatus,
-               
+                CategoryName = entity.Category?.CategoryName ?? string.Empty,
+                PublisherName = entity.Publisher?.PublisherName ?? string.Empty,
                 CategoryId = entity.CategoryId,
                 PublisherId = entity.PublisherId,
                 IsAvailable = entity.AvailableCopies > 0
-
-
             };
         }
 
@@ -170,8 +163,6 @@ namespace SIGEBI.Application.Services
                 TotalCopies = dto.TotalCopies,
                 AvailableCopies = dto.TotalCopies,
                 GeneralStatus = "Disponible",
-
-
             };
         }
 
@@ -185,13 +176,39 @@ namespace SIGEBI.Application.Services
             entity.TotalCopies = dto.TotalCopies;
             entity.AvailableCopies = dto.AvailableCopies;
             entity.GeneralStatus = dto.GeneralStatus;
-            
             entity.CategoryId = dto.CategoryId;
             entity.PublisherId = dto.PublisherId;
             return entity;
         }
-      
 
+        public async Task<OperationResult> GetAllBooksWithRelationships()
+        {
+            try
+            {
+                var result = await _bookRepository.GetAllBooksWithRelationships();
+                return result.Success
+                    ? OperationResult.SuccessResult(result.Data)
+                    : OperationResult.FailureResult(result.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener libros con relaciones.");
+                return OperationResult.FailureResult("Error al obtener libros.");
+            }
+        }
 
+        public async Task<OperationResult> GetBookWithRelationshipsByIdAsync(int id)
+        {
+            try
+            {
+                var result = await _bookRepository.GetBookWithRelationshipsByIdAsync(id);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener libro por ID con relaciones.");
+                return OperationResult.FailureResult("Error interno al obtener el libro.");
+            }
+        }
     }
 }

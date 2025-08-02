@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Contracts.Service;
 using SIGEBI.Application.Dtos.BooksDtos;
+using SIGEBI.Domain.Base;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,7 +22,7 @@ namespace SIGEBI.api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var result = await _bookService.GetAllAsync();
+            var result = await _bookService.GetAllBooksWithRelationships();
             return result.Success
                 ? Ok(result)
                 : StatusCode(500, new { Message = result.Message ?? "Error al obtener los libros." });
@@ -31,16 +32,17 @@ namespace SIGEBI.api.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var result = await _bookService.GetByIdAsync(id);
-            if (result.Success)
-                return result != null ? Ok(result) : NotFound($"Libro con ID {id} no encontrado.");
+            var result = await _bookService.GetBookWithRelationshipsByIdAsync(id);
 
-            return StatusCode(500, new { Message = result.Message ?? $"Error al obtener el libro con ID {id}." });
+            if (!result.Success || result.Data == null)
+                return NotFound(result.Message);
+
+            return Ok(result.Data);
         }
 
         // POST: api/Book
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateBookDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateBookDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -139,7 +141,11 @@ namespace SIGEBI.api.Controllers
         public async Task<IActionResult> CheckDuplicateISBN([FromBody] string isbn)
         {
             var result = await _bookService.CheckDuplicateISBNAsync(isbn);
-            return Ok(new { IsDuplicate = result.Success });
+            if (!result.Success)
+                return StatusCode(500, result.Message);
+
+            return Ok(new { IsDuplicate = result.Data is true });
         }
+
     }
 }

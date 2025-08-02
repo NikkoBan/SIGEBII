@@ -9,7 +9,7 @@ namespace SIGEBI.Domain.Entities.Configuration
     public class Categories : BaseEntity<int>
     {
 
-       
+        [Column("CategoryId")]
         public override  int Id { get; set; }
         public string CategoryName { get; set; }= string.Empty;
         public string? Description { get; set; }

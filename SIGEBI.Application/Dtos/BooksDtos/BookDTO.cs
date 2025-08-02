@@ -18,5 +18,6 @@ namespace SIGEBI.Application.Dtos.BooksDtos
         public int AvailableCopies { get; set; }
         public string GeneralStatus { get; set; } = string.Empty;
         public bool IsAvailable { get; set; }
+
     }
 }

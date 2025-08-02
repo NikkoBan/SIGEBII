@@ -1,98 +1,149 @@
-﻿@model SIGEBI.Web0.Models.BookModel
+﻿@model SIGEBI.Web0.Models.Book.EditBookModel
 
 @{
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<style>
+    /* Estilos personalizados para esta vista */
+    .btn-marron-oscuro {
+        background-color: #6D4C41; /* Marrón oscuro (chocolate) */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-marron-oscuro:hover {
+            background-color: #5D4037; /* Marrón más oscuro al pasar el ratón */
+            color: white;
+        }
+
+    .btn-marron-claro {
+        background-color: #D7CCC8; /* Marrón claro (pastel) */
+        color: #3e2723; /* Texto oscuro para contraste */
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-marron-claro:hover {
+            background-color: #BCAAA4; /* Marrón claro más oscuro al pasar el ratón */
+            color: #3e2723;
+        }
+
+    .custom-title {
+        color: #6D4C41; /* Usa el mismo marrón oscuro para coherencia */
+        font-weight: 300;
+        margin-bottom: 20px;
+    }
+
+    .form-container {
+        padding: 20px;
+        border-radius: 8px;
+        background-color: #f8f9fa; /* Un fondo muy claro para la sección del formulario */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+
+<h1 class="custom-title">Edit</h1>
 
 <h4>BookModel</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="bookId" class="control-label"></label>
-                <input asp-for="bookId" class="form-control" />
-                <span asp-validation-for="bookId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="title" class="control-label"></label>
-                <input asp-for="title" class="form-control" />
-                <span asp-validation-for="title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="isbn" class="control-label"></label>
-                <input asp-for="isbn" class="form-control" />
-                <span asp-validation-for="isbn" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="publicationDate" class="control-label"></label>
-                <input asp-for="publicationDate" class="form-control" />
-                <span asp-validation-for="publicationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="categoryId" class="control-label"></label>
-                <input asp-for="categoryId" class="form-control" />
-                <span asp-validation-for="categoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="categoryName" class="control-label"></label>
-                <input asp-for="categoryName" class="form-control" />
-                <span asp-validation-for="categoryName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="publisherId" class="control-label"></label>
-                <input asp-for="publisherId" class="form-control" />
-                <span asp-validation-for="publisherId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="publisherName" class="control-label"></label>
-                <input asp-for="publisherName" class="form-control" />
-                <span asp-validation-for="publisherName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="language" class="control-label"></label>
-                <input asp-for="language" class="form-control" />
-                <span asp-validation-for="language" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="summary" class="control-label"></label>
-                <input asp-for="summary" class="form-control" />
-                <span asp-validation-for="summary" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="totalCopies" class="control-label"></label>
-                <input asp-for="totalCopies" class="form-control" />
-                <span asp-validation-for="totalCopies" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="availableCopies" class="control-label"></label>
-                <input asp-for="availableCopies" class="form-control" />
-                <span asp-validation-for="availableCopies" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="generalStatus" class="control-label"></label>
-                <input asp-for="generalStatus" class="form-control" />
-                <span asp-validation-for="generalStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="isAvailable" /> @Html.DisplayNameFor(model => model.isAvailable)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <div class="col-md-6">
+        <div class="form-container">
+            <form asp-action="Edit">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="BookId" class="control-label"></label>
+                    <input asp-for="BookId" class="form-control" />
+                    <span asp-validation-for="BookId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ISBN" class="control-label"></label>
+                    <input asp-for="ISBN" class="form-control" />
+                    <span asp-validation-for="ISBN" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PublicationDate" class="control-label"></label>
+                    <input asp-for="PublicationDate" class="form-control" />
+                    <span asp-validation-for="PublicationDate" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="CategoryId" class="control-label"></label>
+                    <input asp-for="CategoryId" class="form-control" />
+                    <span asp-validation-for="CategoryId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PublisherId" class="control-label"></label>
+                    <input asp-for="PublisherId" class="form-control" />
+                    <span asp-validation-for="PublisherId" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Language" class="control-label"></label>
+                    <input asp-for="Language" class="form-control" />
+                    <span asp-validation-for="Language" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Summary" class="control-label"></label>
+                    <input asp-for="Summary" class="form-control" />
+                    <span asp-validation-for="Summary" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="TotalCopies" class="control-label"></label>
+                    <input asp-for="TotalCopies" class="form-control" />
+                    <span asp-validation-for="TotalCopies" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="AvailableCopies" class="control-label"></label>
+                    <input asp-for="AvailableCopies" class="form-control" />
+                    <span asp-validation-for="AvailableCopies" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="GeneralStatus" class="control-label"></label>
+                    <input asp-for="GeneralStatus" class="form-control" />
+                    <span asp-validation-for="GeneralStatus" class="text-danger"></span>
+                </div>
+
+                <div class="form-group form-check mb-3">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
+                    </label>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <input type="submit" value="Save" class="btn btn-marron-oscuro" />
+                    <a asp-action="Index" class="btn btn-marron-claro">Back to List</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
