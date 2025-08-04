@@ -18,5 +18,6 @@ namespace SIGEBI.Domain.Entities
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
+        public ICollection<Loan> Loans { get; set; } = new List<Loan>();
     }
 }

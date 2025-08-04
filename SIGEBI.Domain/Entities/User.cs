@@ -19,9 +19,10 @@ namespace SIGEBI.Domain.Entities
         public string? UpdatedBy { get; set; } 
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; } 
-        public string? DeletedBy { get; set; } 
+        public string? DeletedBy { get; set; }
 
         public ICollection<UserHistory> UserHistories { get; set; } = new List<UserHistory>();
+        public ICollection<Loan> Loans { get; set; } = new List<Loan>();
         /* Agrega aquí colecciones de navegación para otras entidades si se relacionan con User (ej. Loan, Reservation, Sanction, UserRole). */
     }
 }

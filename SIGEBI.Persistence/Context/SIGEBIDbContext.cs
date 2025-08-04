@@ -13,17 +13,19 @@ namespace SIGEBI.Persistence.Context
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<UserHistory> UserHistories { get; set; } = null!;
 
-        /* Agrega aquí los DbSet para otras entidades si se relacionan con User
-          public DbSet<Role> Roles { get; set; } = null!;
-          public DbSet<Loan> Loans { get; set; } = null!;
-          public DbSet<Reservation> Reservations { get; set; } = null!;
-          public DbSet<Sanction> Sanctions { get; set; } = null!;
-        */
+        public DbSet<Loan> Loans { get; set; } = null!;
+        public DbSet<LoanDetail> LoanDetails { get; set; } = null!;
+        public DbSet<LoanHistory> LoanHistories { get; set; } = null!;
+        public DbSet<LoanStatus> LoanStatuses { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.ApplyConfiguration(new SIGEBI.Domain.Entities.Configuration.LoanConfiguration());
+            modelBuilder.ApplyConfiguration(new SIGEBI.Domain.Entities.Configuration.LoanDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new SIGEBI.Domain.Entities.Configuration.LoanHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new SIGEBI.Domain.Entities.Configuration.LoanStatusConfiguration());
             // Mapeo para la entidad User (dbo.Users)
             modelBuilder.Entity<User>(entity =>
             {

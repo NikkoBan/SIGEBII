@@ -27,5 +27,7 @@ namespace SIGEBI.Domain.Entities
         public DateTime? DeletedAt { get; set; }
         public string? DeletedBy { get; set; }
         public virtual ICollection<BookAuthor> BookAuthors { get; set; } = new List<BookAuthor>();
+        public ICollection<Loan> Loans { get; set; } = new List<Loan>();
+
     }
 }
