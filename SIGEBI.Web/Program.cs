@@ -23,6 +23,11 @@ namespace SIGEBI.Web
             builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
 
+            //Logging 
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.AddDebug();
+
             // Configuración de Rate Limiting
             builder.Services.AddRateLimiter(options =>
             {

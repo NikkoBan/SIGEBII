@@ -7,12 +7,17 @@ namespace SIGEBI.Web.Services
     {
         private readonly IHttpService _httpService;
         private readonly ILogger<PublishersHttpService> _logger;
-        private readonly string _apiBaseUrl = "https://localhost:7276/api/Publishers";
+        private readonly string _apiBaseUrl;
 
-        public PublishersHttpService(IHttpService httpService, ILogger<PublishersHttpService> logger)
+        public PublishersHttpService(
+            IHttpService httpService,
+            ILogger<PublishersHttpService> logger,
+            IConfiguration configuration)
         {
             _httpService = httpService;
             _logger = logger;
+            _apiBaseUrl = configuration["ApiSettings:PublishersBaseUrl"]
+                ?? throw new ArgumentNullException("ApiSettings:PublishersBaseUrl");
         }
 
         public async Task<List<PublishersViewModel>> GetAllAsync()
