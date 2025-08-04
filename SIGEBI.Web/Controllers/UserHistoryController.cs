@@ -1,28 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Web.Repositories;
 using SIGEBI.Web.Models.UserHistory;
-using SIGEBI.Application.DTOsAplication.UserHistoryDTOs;
-using System.Collections.Generic;
-using System.Linq;
+using SIGEBI.Web.Repositories.interfaces;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SIGEBI.Web.Controllers
 {
     public class UserHistoryController : Controller
     {
-        private readonly IUserHistoryApiRepository _historyApiRepository;
+        private readonly IUserHistoryWebRepository _repo;
 
-        public UserHistoryController(IUserHistoryApiRepository historyApiRepository)
+        public UserHistoryController(IUserHistoryWebRepository repo)
         {
-            _historyApiRepository = historyApiRepository;
+            _repo = repo;
         }
 
         // GET: /UserHistory/
         public async Task<IActionResult> Index()
         {
-            var historyDtos = await _historyApiRepository.GetAllAsync() ?? new List<UserHistoryDisplayDto>();
-            var viewModels = historyDtos.Select(MapToViewModel).ToList();
-            return View(viewModels); // Espera IEnumerable<UserHistoryViewModel>
+            var response = await _repo.GetAllAsync();
+            if (!response.Success)
+                ViewBag.ErrorMessage = response.Message + $" TraceId: {response.TraceId}";
+            return View(response.Data);
         }
 
         // GET: /UserHistory/Details/{id}
@@ -34,43 +33,35 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            var dto = await _historyApiRepository.GetByIdAsync(id);
-            if (dto == null)
+            var response = await _repo.GetByIdAsync(id);
+            if (!response.Success || response.Data == null)
             {
-                ViewBag.ErrorMessage = $"Entrada de historial con ID {id} no encontrada.";
+                ViewBag.ErrorMessage = response.Message + $" TraceId: {response.TraceId}";
                 return View();
             }
-
-            var vm = MapToViewModel(dto);
-            return View(vm); // Espera UserHistoryViewModel
+            return View(response.Data);
         }
 
         // GET: /UserHistory/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         // POST: /UserHistory/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(UserHistoryCreationDto model)
+        public async Task<IActionResult> Create(UserHistoryRequest model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
-            var success = await _historyApiRepository.CreateAsync(model);
-
-            if (success)
+            var response = await _repo.CreateAsync(model);
+            if (response.Success && response.Data)
             {
                 TempData["SuccessMessage"] = "Entrada de historial registrada exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                ViewBag.ErrorMessage = "Error al registrar la entrada de historial.";
+                ViewBag.ErrorMessage = response.Message + $" TraceId: {response.TraceId}";
                 return View(model);
             }
         }
@@ -84,15 +75,13 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            var dto = await _historyApiRepository.GetByIdAsync(id);
-            if (dto == null)
+            var response = await _repo.GetByIdAsync(id);
+            if (!response.Success || response.Data == null)
             {
-                ViewBag.ErrorMessage = "Entrada de historial no encontrada para borrar.";
+                ViewBag.ErrorMessage = response.Message + $" TraceId: {response.TraceId}";
                 return View();
             }
-
-            var vm = MapToViewModel(dto);
-            return View(vm); // Espera UserHistoryViewModel
+            return View(response.Data);
         }
 
         // POST: /UserHistory/Delete/{id}
@@ -100,16 +89,15 @@ namespace SIGEBI.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var success = await _historyApiRepository.DeleteAsync(id);
-
-            if (success)
+            var response = await _repo.DeleteAsync(id);
+            if (response.Success && response.Data)
             {
                 TempData["SuccessMessage"] = "Entrada de historial eliminada exitosamente.";
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                ViewBag.ErrorMessage = "Error al eliminar la entrada de historial.";
+                ViewBag.ErrorMessage = response.Message + $" TraceId: {response.TraceId}";
                 return RedirectToAction(nameof(Delete), new { id });
             }
         }
@@ -123,26 +111,10 @@ namespace SIGEBI.Web.Controllers
                 return View("Index", new List<UserHistoryViewModel>());
             }
 
-            var dtos = await _historyApiRepository.GetByUserIdAsync(userId) ?? new List<UserHistoryDisplayDto>();
-            var vms = dtos.Select(MapToViewModel).ToList();
-            return View("Index", vms);
-        }
-
-        // Utilidad para mapear DTO a ViewModel
-        private UserHistoryViewModel MapToViewModel(UserHistoryDisplayDto dto)
-        {
-            return new UserHistoryViewModel
-            {
-                LogId = dto.LogId,
-                UserId = dto.UserId,
-                EnteredEmail = dto.EnteredEmail,
-                AttemptDate = dto.AttemptDate,
-                IpAddress = dto.IpAddress,
-                UserAgent = dto.UserAgent,
-                IsSuccessful = dto.IsSuccessful,
-                FailureReason = dto.FailureReason,
-                ObtainedRole = dto.ObtainedRole
-            };
+            var resp = await _repo.GetByUserIdAsync(userId);
+            if (!resp.Success)
+                ViewBag.ErrorMessage = resp.Message + $" TraceId: {resp.TraceId}";
+            return View("Index", resp.Data);
         }
     }
 }
