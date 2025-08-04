@@ -1,20 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using static SIGEBI.Web0.Models.BookAuthorModel.BookAuthorBase;
 
 namespace SIGEBI.Web0.Models.BookAuthor
 {
-    public class BookAuthorModel
+    public class BookAuthorModel : BaseBookAuthorModel
     {
-        [Display(Name = "ID Libro")]
-        public int BookId { get; set; }
-
-        [Display(Name = "ID Autor")]
-        public int AuthorId { get; set; }
         [Display(Name = "Título del Libro")]
         public string? BookTitle { get; set; }
 
         [Display(Name = "Nombre del Autor")]
         public string? AuthorName { get; set; }
-
-
     }
 }

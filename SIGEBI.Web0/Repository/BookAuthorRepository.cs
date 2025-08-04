@@ -1,11 +1,7 @@
 ﻿using SIGEBI.Web0.Interfaz.BookAuthor;
 using SIGEBI.Web0.Models.BookAuthor;
 using SIGEBI.Web0.Models;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 
 namespace SIGEBI.Web0.Repositories.BookAuthorRepository
 {
@@ -53,14 +49,14 @@ namespace SIGEBI.Web0.Repositories.BookAuthorRepository
                 else
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Error al crear relación Libro-Autor: {StatusCode} - {Content}", response.StatusCode, errorContent);
+                    _logger.LogError("Error al crea relación Libro-Autor: {StatusCode} - {Content}", response.StatusCode, errorContent);
                     throw new ApplicationException($"Error al crear relación Libro-Autor: {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inesperado al crear relación Libro-Autor.");
-                throw new ApplicationException($"Error inesperado al crear relación Libro-Autor: {ex.Message}");
+                _logger.LogError(ex, "Error  al crear relación LibroAutor.");
+                throw new ApplicationException($"Error  al crear relación LibroAutor: {ex.Message}");
             }
         }
 
@@ -76,13 +72,13 @@ namespace SIGEBI.Web0.Repositories.BookAuthorRepository
                 else
                 {
                     string errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogError("Error al eliminar relación Libro-Autor: {StatusCode} - {Content}", response.StatusCode, errorContent);
+                    _logger.LogError("Error al eliminar relación LibroAutor: {StatusCode} - {Content}", response.StatusCode, errorContent);
                     throw new ApplicationException($"Error al eliminar relación Libro-Autor: {errorContent}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error inesperado al eliminar relación Libro-Autor.");
+                _logger.LogError(ex, "Error inesperado al eliminar relación LibroAutor.");
                 throw new ApplicationException($"Error inesperado al eliminar relación Libro-Autor: {ex.Message}");
             }
         }
@@ -130,7 +126,7 @@ namespace SIGEBI.Web0.Repositories.BookAuthorRepository
             }
             catch (HttpRequestException httpEx) when (httpEx.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                _logger.LogWarning("Relación Libro-Autor no encontrada para BookId: {BookId}, AuthorId: {AuthorId}", bookId, authorId);
+                _logger.LogWarning("Relación LibroAutor no encontrada para BookId: {BookId}, AuthorId: {AuthorId}", bookId, authorId);
                 return null;
             }
             catch (Exception ex)
@@ -160,8 +156,8 @@ namespace SIGEBI.Web0.Repositories.BookAuthorRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al obtener modelo de eliminación para BookId: {BookId}, AuthorId: {AuthorId}", bookId, authorId);
-                throw new ApplicationException($"Error al preparar datos para eliminación: {ex.Message}");
+                _logger.LogError(ex, "Error al tener modelo de eliminación para BookId: {BookId}, AuthorId: {AuthorId}", bookId, authorId);
+                throw new ApplicationException($"Error a preparar datos para eliminación: {ex.Message}");
             }
         }
     }

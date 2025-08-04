@@ -1,7 +1,5 @@
-﻿using SIGEBI.Web0.Interfaz;
-using SIGEBI.Web0.Models.Author;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
+﻿using SIGEBI.Web0.Models.Author;
+
 using SIGEBI.Web0.Interfaz.Author;
 
 namespace SIGEBI.Web0.Repositories.AuthorRepository

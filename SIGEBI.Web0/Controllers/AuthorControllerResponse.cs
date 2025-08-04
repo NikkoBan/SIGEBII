@@ -20,7 +20,7 @@ namespace SIGEBI.Web0.Controllers
 
             try
             {
-                var authors = await _authorWebService.GetAllAuthorsAsync();
+                var authors = await _authorWebService.GetAllAsync();
                 return View(authors);
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace SIGEBI.Web0.Controllers
         {
             try
             {
-                var author = await _authorWebService.GetAuthorByIdAsync(id);
+                var author = await _authorWebService.GetByIdAsync(id);
                 if (author == null)
                 {
                     TempData["ErrorMessage"] = "Autor no encontrado.";
@@ -74,7 +74,7 @@ namespace SIGEBI.Web0.Controllers
             }
             try
             {
-                bool isSuccess = await _authorWebService.CreateAuthorAsync(model);
+                bool isSuccess = await _authorWebService.CreateAsync(model);
                 if (isSuccess)
                 {
                     TempData["SuccessMessage"] = "Autor creado exitosamente.";
@@ -100,7 +100,7 @@ namespace SIGEBI.Web0.Controllers
 
             try
             {
-                var editModel = await _authorWebService.GetEditAuthorModelByIdAsync(id);
+                var editModel = await _authorWebService.GetEditModelByIdAsync(id);
                 if (editModel == null)
                 {
                     TempData["ErrorMessage"] = "Autor no encontrado para edición.";
@@ -132,7 +132,7 @@ namespace SIGEBI.Web0.Controllers
             }
             try
             {
-                bool isSuccess = await _authorWebService.UpdateAuthorAsync(id, model);
+                bool isSuccess = await _authorWebService.UpdateAsync(id, model);
                 if (isSuccess)
                 {
                     TempData["SuccessMessage"] = "Autor actualizado exitosamente.";
@@ -155,7 +155,7 @@ namespace SIGEBI.Web0.Controllers
         {
             try
             {
-                var author = await _authorWebService.GetAuthorByIdAsync(id);
+                var author = await _authorWebService.GetByIdAsync(id);
                 if (author == null)
                 {
                     TempData["ErrorMessage"] = "Autor no encontrado para eliminar.";

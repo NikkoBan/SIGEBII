@@ -32,12 +32,19 @@ namespace SIGEBI.api.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
+
             var result = await _bookService.GetBookWithRelationshipsByIdAsync(id);
 
-            if (!result.Success || result.Data == null)
-                return NotFound(result.Message);
+            // La lógica de verificación debe ser sobre el objeto completo.
+            if (!result.Success)
+            {
+                // Devolvemos el objeto completo con un estado de error,
+                // que es más consistente.
+                return NotFound(result);
+            }
 
-            return Ok(result.Data);
+            // Devolvemos el resultado completo, que incluye success y data.
+            return Ok(result);
         }
 
         // POST: api/Book

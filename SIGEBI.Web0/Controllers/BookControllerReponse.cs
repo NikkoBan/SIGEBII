@@ -1,7 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
+
 using SIGEBI.Web0.Models.Book;
 using SIGEBI.Web0.Services.Book;
 
@@ -27,7 +26,7 @@ namespace SIGEBI.Web0.Controllers
         {
             try
             {
-                var books = await _bookService.GetAllBooksAsync();
+                var books = await _bookService.GetAllAsync();
                 return View(books);
             }
             catch (Exception ex)
@@ -86,7 +85,7 @@ namespace SIGEBI.Web0.Controllers
             try
             {
                 // Le pide al servicio que cree el libro
-                bool isSuccess = await _bookService.CreateBookAsync(model);
+                bool isSuccess = await _bookService.CreateAsync(model);
                 if (isSuccess)
                 {
                     TempData["SuccessMessage"] = "Libro creado exitosamente.";
@@ -120,7 +119,7 @@ namespace SIGEBI.Web0.Controllers
             try
             {
                 // Le pide al servicio que prepare el modelo para edición
-                editModel = await _bookService.GetEditBookModelByIdAsync(id);
+                editModel = await _bookService.GetEditModelByIdAsync(id);
                 if (editModel == null)
                 {
                     TempData["ErrorMessage"] = "Libro no encontrado para edición.";
@@ -163,7 +162,7 @@ namespace SIGEBI.Web0.Controllers
 
                 try
                 {
-                    bool isSuccess = await _bookService.UpdateBookAsync(id, model);
+                    bool isSuccess = await _bookService.UpdateAsync(id, model);
                     if (isSuccess)
                     {
                         TempData["SuccessMessage"] = "Libro actualizado exitosamente.";

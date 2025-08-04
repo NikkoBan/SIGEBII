@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Web0.Interfaz.BookAuthor;
 using SIGEBI.Web0.Models.BookAuthor;
-using SIGEBI.Web0.Interfaz.Author;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
-using SIGEBI.Web0.Interfaces.Book;
 using SIGEBI.Web0.Services.BookAuthor;
 
 namespace SIGEBI.Web0.Controllers
